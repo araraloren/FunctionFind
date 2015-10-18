@@ -209,7 +209,7 @@ protected:
     bool __start();
 
     //辅助函数
-	bool __startThread(cc::thread_t& thread_t, cc::thread_func* pfunc, cc::thread_para_t para);
+    bool __startThread(cc::thread_t& thread, cc::thread_func* pfunc, cc::thread_para_t para);
 
 protected:
     //write线程
@@ -222,7 +222,7 @@ protected:
 
 	int      m_write_interval;
 	int      m_check_interval;
-	size_t       m_stop_times;
+    size_t   m_stop_times;
 	int      m_stop_count;
 
     bool    m_write_flag;
