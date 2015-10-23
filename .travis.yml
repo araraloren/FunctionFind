@@ -1,9 +1,13 @@
 language: cpp
-compiler: 
+
+compiler:
   - gcc
 
-script:
-- if [ "$CXX" == "clang++" ]; then export CXX="clang++" && bii cpp:build; fi
-- if [ "$CXX" == "g++" ];     then export CXX="g++"     && bii cpp:build; fi
+before_script:
+  - mkdir build
+  - cd build
+  - cmake ..
+
+script: make
 
 install: true
