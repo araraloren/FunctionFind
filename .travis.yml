@@ -1,4 +1,5 @@
-install: true
-script: cmake --build
 language: cpp
 compiler: gcc
+script:
+  - cmake --build
+install: true
