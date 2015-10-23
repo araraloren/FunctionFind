@@ -1,0 +1,4 @@
+install: true
+script: cmake 
+language: cpp
+compiler: gcc
