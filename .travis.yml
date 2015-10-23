@@ -1,4 +1,4 @@
 install: true
-script: cd FunctionFind && mkdir build && cmake .. && make 
+script: cmake --build
 language: cpp
 compiler: gcc
