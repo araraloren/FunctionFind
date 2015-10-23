@@ -1,4 +1,4 @@
 install: true
-script: cmake 
+script: mkdir build && cmake .. && make 
 language: cpp
 compiler: gcc
