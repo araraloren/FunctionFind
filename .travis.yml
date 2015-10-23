@@ -1,10 +1,9 @@
 language: cpp
 compiler: 
   - gcc
-  - clang
 
 script:
-  - cmake --build
-  - ./bin/foo
+- if [ "$CXX" == "clang++" ]; then export CXX="clang++" && bii cpp:build; fi
+- if [ "$CXX" == "g++" ];     then export CXX="g++"     && bii cpp:build; fi
 
 install: true
