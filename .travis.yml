@@ -1,5 +1,10 @@
 language: cpp
-compiler: gcc
+compiler: 
+  - gcc
+  - clang
+
 script:
   - cmake --build
+  - ./bin/foo
+
 install: true
