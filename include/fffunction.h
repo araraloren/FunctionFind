@@ -109,6 +109,15 @@ struct FunctionSignature
     }
 };
 
+struct Function{
+
+    FunctionSignature fs_;
+
+    unsigned int line_;
+
+    unsigned int colum_;
+};
+
 NAMESPACE_FF_END
 
 #endif // FFFUNCTION_H

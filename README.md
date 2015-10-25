@@ -1,5 +1,7 @@
 # FunctionFind
 
+FunctionFind is tool used libclang parser c++ header or source file
+
 find c/c++ function in source or header file. 
 
 It's not yet complete.

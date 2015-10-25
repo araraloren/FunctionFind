@@ -7,6 +7,7 @@ set(SRC_LIST
     ./cc/ccpublic.cpp
     ./src/main.cpp
     ./src/ffoption.cpp
+    ./src/fffuncparser.cpp
     ./threadpool/threadpool.cpp
     ./threadpool/syncsemaphore.cpp
     ./threadpool/thread.hpp
