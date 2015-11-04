@@ -12,8 +12,14 @@ set(SRC_LIST
     ./threadpool/syncsemaphore.cpp
     ./threadpool/thread.hpp
 )
+find_library(
+    LIBCLANG
+    clang
+    /usr/lib/llvm/ /usr/lib64/llvm /usr/local/lib/llvm /usr/local/lib64/llvm
+)
 set(LIBRARIES
     pthread
+    ${LIBCLANG}
 )
 include_directories(
     ./
