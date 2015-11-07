@@ -7,6 +7,10 @@
 #include <string>
 #include <vector>
 
+#if __cplusplus >= 201103L
+#   include <type_traits>
+#endif
+
 #ifdef CC_PF_LINUX
 #   include <unistd.h>
 #   include <sys/stat.h>
@@ -73,14 +77,95 @@ createDirectory(const string& directory);
 /*
  * 分割字符串
 */
-std::vector<std::string>
-spiltString(const std::string& str, const char sep);//sep = '|','@', etc
 
 std::vector<std::string>
-spiltString(const std::string &str, const char sep[]);//sep = {"^^"}, {"||"}, etc
+spiltString(const std::string& str, int capacity = 1);//split string with whitespace
+
+//std::vector<std::string>
+//spiltString(const std::string& str, const char sep, int capacity = 1);//sep = '|','@', etc
+
+//std::vector<std::string>
+//spiltString(const std::string &str, const char sep[], int capacity = 1);//sep = {"^^"}, {"||"}, etc
+
+//std::vector<std::string>
+//spiltString(const std::string &str, const std::string& sep, int capacity = 1);
+
+template <typename X>
+struct splitstring_helper {
+    static const bool value = false;
+};
+
+template <>
+struct splitstring_helper<char> {
+    static const bool value = true;
+};
+
+#if __cplusplus >= 201103L
 
 std::vector<std::string>
-spiltString(const std::string &str, const std::string& regex);
+spiltString(const std::string &str, const std::string& regex, int capacity = 1);
+
+#else
+
+template <>
+struct splitstring_helper<std::string> {
+    static const bool value = true;
+};
+
+#endif
+
+template <size_t N>
+struct splitstring_helper<char[N]> {
+    static const bool value = true;
+};
+
+template <>
+struct splitstring_helper<char*> {
+    static const bool value = true;
+};
+
+template <bool>
+struct splitstring_ {
+    template <typename X>
+    static std::vector<std::string>
+    spiltString(const std::string &str, const X& sep, int capacity);
+};
+
+template <>
+struct splitstring_<true> {
+    template <typename X>
+    static std::vector<std::string>
+    spiltString(const std::string &str, const X& sep, int capacity)
+    {
+        std::vector<std::string> ret(capacity);
+        std::string::size_type cut = 0;
+        std::string::size_type cur = 0;
+
+        while(true) {
+            cur = str.find(sep, cut);
+
+            if (cut == std::string::npos) {
+                ret.push_back(str.substr(cut));
+                break;
+            } else {
+                ret.push_back(str.substr(cut, cur - cut));
+                cut = cur + 1;
+            }
+        }
+
+        return ret;
+    }
+};
+
+template <typename T>
+std::vector<std::string>
+spiltString(const std::string &str, const T& sep, int capacity = 1)
+{
+    return splitstring_<splitstring_helper<T>::value>::spiltString(str,
+                                                                   sep,
+                                                                   capacity);
+}
+
 
 /*
  * 异常安全的print
@@ -121,6 +206,25 @@ print(std::ostream& out, T value, Args... args)
 {
 	print(out, value);
 	print(out, args ...);
+}
+
+/*
+ * 递归的将args里面的数据输出到out里面
+*/
+template <typename T>
+void
+println(std::ostream& out, T& s)
+{
+    out <<s;
+}
+
+template<typename T, typename... Args>
+void
+println(std::ostream& out, T value, Args... args)
+{
+    println(out, value);
+    println(out, args ...);
+    println(out, '\n');
 }
 
 #endif

@@ -3,6 +3,7 @@
 
 #include <vector>
 #include <string>
+#include <ccpublic.h>
 #include <ffconfig.h>
 
 NAMESPACE_FF_BEGIN
@@ -32,7 +33,7 @@ struct FunctionSignature
     void
     parseSignature(const std::string& signature)
     {
-        //add
+        //add parser signature [type (type)]
         FF_AVOID_WARNING(signature);
     }
 
@@ -44,8 +45,8 @@ struct FunctionSignature
 
     void parseArgsType(const std::string& args_type)
     {
-        //add
-        FF_AVOID_WARNING(args_type);
+        //split argstype with white space
+        this->args_type_ = cc::spiltString(args_type);
     }
 
     std::string

@@ -5,6 +5,7 @@ set(SRC_LIST
     ./cpplogger/clinforegistry.cpp
     ./cpplogger/clinfo.cpp
     ./cc/ccpublic.cpp
+    ./cc/cctest.cpp
     ./src/main.cpp
     ./src/ffoption.cpp
     ./src/fffuncparser.cpp

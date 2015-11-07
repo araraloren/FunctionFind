@@ -77,6 +77,9 @@ FuncParser::visitCursor(CXCursor cursor)
 
     CXString str = clang_getCursorKindSpelling(kind);
 
+    FF_AVOID_WARNING(str);
+    //add parser cpp or header file
+
 #ifdef FF_DEBUG
     std::fprintf(stderr, "CursorKind:%s\n", clang_getCString(str));
 #endif

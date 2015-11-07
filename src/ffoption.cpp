@@ -88,6 +88,7 @@ FFOption::parseCommandArgs(int argc, char **argv)
 
     while((opt = getopt_long(argc, argv, cmd_short_options, cmd_long_options, &option_index)) != -1){
         if (opt == -1) {
+            this->printOptionHelp();
             break;
         }
         switch (opt) {
@@ -115,7 +116,7 @@ FFOption::parseCommandArgs(int argc, char **argv)
         }
     }
 
-    if (this->function_signature_ == functionSignature()) {
+    if (this->function_signature_ == FunctionSignature()) {
         if (!ret_type.empty()) {
             this->function_signature_.parseRetType(ret_type);
         }

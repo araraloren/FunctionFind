@@ -8,6 +8,7 @@
 #   include <errno.h>
 #endif
 
+#include <cctype>
 #include <ctime>
 
 //copyed from https://github.com/swem/player-git-svn/blob/master/replace/nanosleep.c
@@ -228,4 +229,39 @@ printf(std::ostream& out, const char* s)
 }
 
 #endif
+
+std::vector<std::string>
+cc::spiltString(const std::string &str, int capacity)
+{
+    std::vector<std::string> ret(capacity);
+    std::string::const_iterator beg = str.begin();
+    std::string::const_iterator cut = beg;
+    std::string::const_iterator cit = beg;
+    std::string::const_iterator end = str.end();
+
+    while(cit != end) {
+        for (;!std::isspace(*cit) && cit != end; cit ++)
+            ;
+        if (cit - cut > 0) {
+            ret.push_back(str.substr(cut - beg, cit - cut));
+        }
+        for (;std::isspace(*cit) && cit != end; cit ++)
+            ;
+        cut = cit;
+    }
+
+    return ret;
+}
+
+#if __cplusplus >= 201103L
+std::vector<std::string>
+cc::spiltString(const std::string &str, const std::string &sep, int capacity)
+{
+
+}
+#endif
+
+
+
+
 
