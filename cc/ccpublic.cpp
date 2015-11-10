@@ -11,6 +11,10 @@
 #include <cctype>
 #include <ctime>
 
+#if __cplusplus >= 201103L
+#   include <regex>
+#endif
+
 //copyed from https://github.com/swem/player-git-svn/blob/master/replace/nanosleep.c
 #if (defined CC_PF_WIN32) || ((defined CC_PF_MINGW32) && (!defined _GLIBCXX_USE_NANOSLEEP))
 
@@ -243,7 +247,7 @@ cc::spiltString(const std::string &str, int capacity)
         for (;!std::isspace(*cit) && cit != end; cit ++)
             ;
         if (cit - cut > 0) {
-            ret.push_back(str.substr(cut - beg, cit - cut));
+            ret.insert(ret.end(), str.substr(cut - beg, cit - cut));
         }
         for (;std::isspace(*cit) && cit != end; cit ++)
             ;
@@ -253,11 +257,23 @@ cc::spiltString(const std::string &str, int capacity)
     return ret;
 }
 
+#include <iostream>
+
 #if __cplusplus >= 201103L
 std::vector<std::string>
 cc::spiltString(const std::string &str, const std::string &sep, int capacity)
 {
+    std::vector<std::string> ret(capacity);
+    std::regex  pattern(sep);
 
+    std::sregex_token_iterator sit(str.begin(), str.end(), pattern, -1);
+    std::sregex_token_iterator end;
+
+    for (sit;sit != end;sit ++) {
+        ret.insert(ret.end(), *sit);
+    }
+
+    return ret;
 }
 #endif
 

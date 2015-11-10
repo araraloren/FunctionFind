@@ -29,8 +29,11 @@ int main(int argc, char** argv)
     cout <<"get x -> "<<x<<endl;
     cout <<FF_TO_SRTING(squeue)<<" size -> "<<squeue.count()<<endl;
 
+#if __cplusplus >= 201103L
+    cc::println(cc::spiltString(string("1 2  4 dksja    ida  qwd www"), string("\\s+")));
+#else
     cc::println(cc::spiltString(string("1 2  4 dksja    ida  qwd www")));
-
+#endif
     return 0;
 }
 

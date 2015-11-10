@@ -7,10 +7,6 @@
 #include <string>
 #include <vector>
 
-#if __cplusplus >= 201103L
-#   include <type_traits>
-#endif
-
 #ifdef CC_PF_LINUX
 #   include <unistd.h>
 #   include <sys/stat.h>
@@ -144,11 +140,12 @@ struct splitstring_<true> {
         while(true) {
             cur = str.find(sep, cut);
 
-            if (cut == std::string::npos) {
-                ret.push_back(str.substr(cut));
+            //fix this error
+            if (cur == std::string::npos) {
+                ret.insert(ret.end(), str.substr(cut));
                 break;
             } else {
-                ret.push_back(str.substr(cut, cur - cut));
+                ret.insert(ret.end(), str.substr(cut, cur - cut));
                 cut = cur + 1;
             }
         }
