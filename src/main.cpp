@@ -34,6 +34,7 @@ int main(int argc, char** argv)
 #else
     cc::println(cc::spiltString(string("1 2  4 dksja    ida  qwd www")));
 #endif
+
     return 0;
 }
 

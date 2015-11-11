@@ -169,17 +169,18 @@ spiltString(const std::string &str, const T& sep, int capacity = 1)
 */
 #if __cplusplus >= 201103L
 
+//slowly ?
 void
 printf(std::ostream& out, const char* s);
 
 template<typename T, typename... Args>      // note the "..."
 void
-printf(std::ostream& out, const char* s, T value, Args... args)   // note the "..."
+printf(std::ostream& out, const char* s, T& value, Args... args)   // note the "..."
 {
 	while (*s) {
 		if (*s=='%' && *++s!='%') { // a format specifier (ignore which one it is)
 			out << value;     // use first non-format argument
-			return printf(out, s, args...);    // "peel off" first argument
+            return printf(out, *s ? ++s : s, args ...);    // "peel off" first argument
 		}
 		out << *s++;
 	}
@@ -199,12 +200,11 @@ print(std::ostream& out, T& s)
 
 template<typename T, typename... Args>
 void
-print(std::ostream& out, T value, Args... args)
+print(std::ostream& out, T& value, Args... args)
 {
-	print(out, value);
+    out <<value;
 	print(out, args ...);
 }
-
 /*
  * 递归的将args里面的数据输出到out里面
 */
@@ -217,11 +217,11 @@ println(std::ostream& out, T& s)
 
 template<typename T, typename... Args>
 void
-println(std::ostream& out, T value, Args... args)
+println(std::ostream& out, T& value, Args... args)
 {
-    println(out, value);
+    out << value;
     println(out, args ...);
-    println(out, '\n');
+    out <<'\n';
 }
 
 #endif

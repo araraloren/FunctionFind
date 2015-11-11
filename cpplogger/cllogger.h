@@ -121,7 +121,7 @@ public:
 
         std::ostringstream out;
 
-        cl_printf(out, format, args ...);
+        cc::printf(out, format, args ...);
 
         ClMessage message(id, out.str());
 
@@ -141,7 +141,7 @@ public:
 
         std::ostringstream out;
 
-        cl_printf(out, format, args ...);
+        cc::printf(out, format, args ...);
 
         ClMessage message(id, out.str());
 
@@ -171,7 +171,7 @@ public:
 
         std::ostringstream out;
 
-        cl_print(out, args ...);
+        cc::print(out, args ...);
 
         ClMessage message(id, out.str());
 
@@ -191,7 +191,7 @@ public:
 
         std::ostringstream out;
 
-        cl_print(out, args ...);
+        cc::print(out, args ...);
 
         ClMessage message(id, out.str());
 

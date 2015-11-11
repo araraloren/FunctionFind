@@ -222,7 +222,7 @@ cc::createDirectory(const std::string &directory)
 
 #if __cplusplus >= 201103L
 void
-printf(std::ostream& out, const char* s)
+cc::printf(std::ostream& out, const char* s)
 {
 	while (*s) {
 		if (*s=='%' && *++s!='%')   // make sure that there wasn't meant to be more arguments
