@@ -237,17 +237,42 @@ cc::printf(std::ostream& out, const char* s)
 std::vector<std::string>
 cc::spiltString(const std::string &str, int capacity)
 {
-    std::vector<std::string> ret(capacity);
+    std::vector<std::string> ret;
     std::string::const_iterator beg = str.begin();
     std::string::const_iterator cut = beg;
     std::string::const_iterator cit = beg;
     std::string::const_iterator end = str.end();
 
+    ret.reserve(capacity);
     while(cit != end) {
         for (;!std::isspace(*cit) && cit != end; cit ++)
             ;
         if (cit - cut > 0) {
-            ret.insert(ret.end(), str.substr(cut - beg, cit - cut));
+            ret.push_back(str.substr(cut - beg, cit - cut));
+        }
+        for (;std::isspace(*cit) && cit != end; cit ++)
+            ;
+        cut = cit;
+    }
+
+    return ret;
+}
+
+std::vector<std::string>
+cc::spiltString(const std::string &str, cc::format_func *pf, int capacity)
+{
+    std::vector<std::string> ret;
+    std::string::const_iterator beg = str.begin();
+    std::string::const_iterator cut = beg;
+    std::string::const_iterator cit = beg;
+    std::string::const_iterator end = str.end();
+
+    ret.reserve(capacity);
+    while(cit != end) {
+        for (;!std::isspace(*cit) && cit != end; cit ++)
+            ;
+        if (cit - cut > 0) {
+            ret.push_back(pf(str.substr(cut - beg, cit - cut)));
         }
         for (;std::isspace(*cit) && cit != end; cit ++)
             ;
@@ -263,21 +288,56 @@ cc::spiltString(const std::string &str, int capacity)
 std::vector<std::string>
 cc::spiltString(const std::string &str, const std::string &sep, int capacity)
 {
-    std::vector<std::string> ret(capacity);
+    std::vector<std::string> ret;
     std::regex  pattern(sep);
-
     std::sregex_token_iterator sit(str.begin(), str.end(), pattern, -1);
     std::sregex_token_iterator end;
 
-    for (sit;sit != end;sit ++) {
-        ret.insert(ret.end(), *sit);
+    for (ret.reserve(capacity);sit != end;sit ++) {
+        ret.push_back(*sit);
+    }
+
+    return ret;
+}
+
+std::vector<std::string>
+cc::spiltString(const std::string &str, const std::string &sep, cc::format_func *pf,int capacity)
+{
+    std::vector<std::string> ret;
+    std::regex  pattern(sep);
+    std::sregex_token_iterator sit(str.begin(), str.end(), pattern, -1);
+    std::sregex_token_iterator end;
+
+    for (ret.reserve(capacity);sit != end;sit ++) {
+        ret.push_back(pf(*sit));
     }
 
     return ret;
 }
 #endif
 
+std::string
+cc::trim(const std::string &str)
+{
+    std::string::size_type beg = 0;
+    std::string::size_type end = str.length() - 1;
 
+    while(beg <= end) {
+        if (std::isspace(str[beg])) {
+            ++ beg;
+        } else {
+            break;
+        }
+    }
 
+    while(beg <= end) {
+        if (std::isspace(str[end])) {
+            -- end;
+        } else {
+            break;
+        }
+    }
 
+    return str.substr(beg, end - beg + 1);
+}
 

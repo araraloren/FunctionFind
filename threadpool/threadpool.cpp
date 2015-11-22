@@ -1,5 +1,5 @@
 #include <threadpool.h>
-#include <stdio.h>
+#include <itask.h>
 
 ThreadPool::ThreadPool(size_t pool_size, size_t task_queue_size)
 	:quit_(0)
@@ -84,22 +84,29 @@ ThreadPool::s_run(cc::thread_para_t arg)
 
 	ITask* task = nullptr;
 
-	while(true) {	
+    while(true) {
+        //wait for task
 		current_pool->waitForTask();
 
+        //thread shoud be quit
 		if (thread->canQuit()) {
 			current_pool->notifyPoolQuited();
 			break;
 		}
 
+        //switch thead status
 		thread->switchStatus();
 
+        //pop task
 		current_pool->popTask(task);
 
-		//if (task){
-			//do something
-		//}
+        //run task
+        if (task){
+            task->run();
+            task = nullptr;
+        }
 
+        //switch thead status
 		thread->switchStatus();
 	}
 

@@ -1,5 +1,8 @@
 project(FunctionFind)
 cmake_minimum_required(VERSION 2.8)
+set(CMAKE_CXX_FLAGS "-std=c++11 -g")
+set(CMAKE_CXX_FLAGS_DEBUG "-std=c++11 -g -Wall -Wextra -Werror")
+set(CMAKE_CXX_FLAGS_RELEASE "-std=c++11 -Os -Wall -Wextra -Werror")
 set(SRC_LIST
     ./cpplogger/cllogger.cpp
     ./cpplogger/clinforegistry.cpp
@@ -12,6 +15,7 @@ set(SRC_LIST
     ./threadpool/threadpool.cpp
     ./threadpool/syncsemaphore.cpp
     ./threadpool/thread.hpp
+    ./threadpool/itask.h
 )
 find_library(
     LIBCLANG

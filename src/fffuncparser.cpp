@@ -88,6 +88,8 @@ FuncParser::visitCursor(CXCursor cursor)
 CXChildVisitResult
 FuncParser::FP_vistor(CXCursor cursor, CXCursor parent, CXClientData data)
 {
+    FF_AVOID_WARNING(parent);
+
     FuncParser* fp = static_cast<FuncParser*>(data);
 
     fp->visitCursor(cursor);

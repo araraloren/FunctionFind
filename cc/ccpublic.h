@@ -74,8 +74,13 @@ createDirectory(const string& directory);
  * 分割字符串
 */
 
+typedef std::string format_func(const std::string &);
+
 std::vector<std::string>
 spiltString(const std::string& str, int capacity = 1);//split string with whitespace
+
+std::vector<std::string>
+spiltString(const std::string& str, format_func *pf, int capacity = 1);//split string with whitespace
 
 //std::vector<std::string>
 //spiltString(const std::string& str, const char sep, int capacity = 1);//sep = '|','@', etc
@@ -101,6 +106,9 @@ struct splitstring_helper<char> {
 std::vector<std::string>
 spiltString(const std::string &str, const std::string& regex, int capacity = 1);
 
+std::vector<std::string>
+spiltString(const std::string &str, const std::string& regex, format_func *pf, int capacity = 1);
+
 #else
 
 template <>
@@ -125,6 +133,9 @@ struct splitstring_ {
     template <typename X>
     static std::vector<std::string>
     spiltString(const std::string &str, const X& sep, int capacity);
+    template <typename X>
+    static std::vector<std::string>
+    spiltString(const std::string &str, const X& sep, format_func *pf, int capacity);
 };
 
 template <>
@@ -133,19 +144,45 @@ struct splitstring_<true> {
     static std::vector<std::string>
     spiltString(const std::string &str, const X& sep, int capacity)
     {
-        std::vector<std::string> ret(capacity);
+        std::vector<std::string> ret;
         std::string::size_type cut = 0;
         std::string::size_type cur = 0;
 
+        ret.reserve(capacity);
         while(true) {
             cur = str.find(sep, cut);
 
             //fix this error
             if (cur == std::string::npos) {
-                ret.insert(ret.end(), str.substr(cut));
+                ret.push_back(str.substr(cut));
                 break;
             } else {
-                ret.insert(ret.end(), str.substr(cut, cur - cut));
+                ret.push_back(str.substr(cut, cur - cut));
+                cut = cur + 1;
+            }
+        }
+
+        return ret;
+    }
+
+    template <typename X>
+    static std::vector<std::string>
+    spiltString(const std::string &str, const X& sep, format_func *pf, int capacity)
+    {
+        std::vector<std::string> ret;
+        std::string::size_type cut = 0;
+        std::string::size_type cur = 0;
+
+        ret.reserve(capacity);
+        while(true) {
+            cur = str.find(sep, cut);
+
+            //fix this error
+            if (cur == std::string::npos) {
+                ret.push_back(pf(str.substr(cut)));
+                break;
+            } else {
+                ret.push_back(pf(str.substr(cut, cur - cut)));
                 cut = cur + 1;
             }
         }
@@ -160,6 +197,16 @@ spiltString(const std::string &str, const T& sep, int capacity = 1)
 {
     return splitstring_<splitstring_helper<T>::value>::spiltString(str,
                                                                    sep,
+                                                                   capacity);
+}
+
+template <typename T>
+std::vector<std::string>
+spiltString(const std::string &str, const T& sep, format_func *pf, int capacity = 1)
+{
+    return splitstring_<splitstring_helper<T>::value>::spiltString(str,
+                                                                   sep,
+                                                                   pf,
                                                                    capacity);
 }
 
@@ -225,6 +272,9 @@ println(std::ostream& out, T& value, Args... args)
 }
 
 #endif
+
+std::string
+trim(const std::string& str);
 
 ccNamespaceEnd(cc)
 

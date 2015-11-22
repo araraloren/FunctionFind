@@ -5,6 +5,7 @@
 #endif
 
 #include <cstdio>
+#include <iostream>
 #include <cstdlib>
 
 using namespace ff;
@@ -41,12 +42,12 @@ FFOption::debugPrintStatus() const
     std::printf("\t%s: %ld\n", FF_TO_SRTING(this->start_time_), this->start_time_);
     std::printf("\t%s: %ld\n", FF_TO_SRTING(this->end_time_), this->end_time_);
     std::printf("\t%s:{\n", FF_TO_SRTING(this->function_signature_));
-    std::printf("\t\t%s\n", this->function_signature_.returnType().c_str());
-    std::printf("\t\t%s\n", this->function_signature_.functionName().c_str());
-    std::printf("\t\t[");
-    for (std::vector<std::string>::iterator it = this->function_signature_.argsType().begin();  \
-         it != this->function_signature_.argsType().end();it ++) {
-        std::printf("%s", it->c_str());
+    std::printf("\t\treturn type -> %s\n", this->function_signature_.returnType().c_str());
+    std::printf("\t\tfunction name -> %s\n", this->function_signature_.functionName().c_str());
+    std::printf("\t\targment list -> %lu[", this->function_signature_.argsType().size());
+    for (std::vector<std::string>::const_iterator sit = this->function_signature_.argsType().begin();  \
+         sit != this->function_signature_.argsType().end();sit ++) {
+        std::printf(" %s ", sit->c_str());
     }
     std::printf("]\n\t}\n}\n");
 }
