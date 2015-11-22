@@ -3,6 +3,7 @@
 
 #include <vector>
 #include <string>
+#include <ccpublic.h>
 #include <ffconfig.h>
 
 NAMESPACE_FF_BEGIN
@@ -18,7 +19,7 @@ struct FunctionSignature
     FunctionSignature()
         : ret_type_(),         
           function_name_(),
-          args_type_(1, std::string())
+          args_type_()
     { }
 
     explicit FunctionSignature(const std::string& ret_type,  \
@@ -32,8 +33,31 @@ struct FunctionSignature
     void
     parseSignature(const std::string& signature)
     {
-        //add
-        FF_AVOID_WARNING(signature);
+        //add parser signature [type (type)]
+        std::string::size_type pos = 0;
+
+        pos = signature.find('(');
+        if (std::string::npos == pos) {
+            //signature = arg type, .... -> ret type
+            pos = signature.rfind("->");
+
+            if (std::string::npos == pos) {
+                return;
+            } else {
+                this->args_type_ = cc::spiltString(signature.substr(0, pos), ',', cc::trim);
+                this->ret_type_  = signature.substr(pos + 2);
+            }
+        } else {
+            //signature = ret type(arg type, ...)
+            std::string::size_type rpos = 0;
+
+            this->ret_type_ = signature.substr(0, pos);
+            if (std::string::npos == (rpos = signature.rfind(')'))) {
+                this->args_type_ = cc::spiltString(signature.substr(pos + 1), ',', cc::trim);
+            } else {
+                this->args_type_ = cc::spiltString(signature.substr(pos + 1, rpos - pos - 1), ',', cc::trim);
+            }
+        }
     }
 
     void
@@ -44,8 +68,8 @@ struct FunctionSignature
 
     void parseArgsType(const std::string& args_type)
     {
-        //add
-        FF_AVOID_WARNING(args_type);
+        //split argstype with ','
+        this->args_type_ = cc::spiltString(args_type, ',', cc::trim);
     }
 
     std::string
@@ -66,7 +90,7 @@ struct FunctionSignature
         return args_type_[index];
     }
 
-    std::vector<std::string>
+    const std::vector<std::string>&
     argsType() const
     {
         return this->args_type_;
@@ -107,6 +131,15 @@ struct FunctionSignature
     {
         return !(this->operator ==(fs));
     }
+};
+
+struct Function{
+
+    FunctionSignature fs_;
+
+    unsigned int line_;
+
+    unsigned int colum_;
 };
 
 NAMESPACE_FF_END

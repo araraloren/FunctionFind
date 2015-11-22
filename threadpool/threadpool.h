@@ -6,7 +6,6 @@
 #include <ccsseqqueue.h>
 #include <syncsemaphore.h>
 #include <vector>
-
 #include <thread.hpp>
 
 class ITask;

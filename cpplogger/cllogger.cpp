@@ -304,21 +304,21 @@ cl::ClLogger::__start()
 }
 
 bool
-cl::ClLogger::__startThread(cc::thread_t &thread_t, cc::thread_func *pfunc, cc::thread_para_t para)
+cl::ClLogger::__startThread(cc::thread_t &thread, cc::thread_func *pfunc, cc::thread_para_t para)
 {
 #if __cplusplus >= 201103L
 	cc::thread_t thr(pfunc, para);
 
-    thread_t.swap(thr);
+    thread.swap(thr);
 #else
 #   if (defined CC_PF_LINUX) || (defined CC_PF_MINGW32)
-		int ret = pthread_create(&thread_t, 0, pfunc, para);
+        int ret = pthread_create(&thread, 0, pfunc, para);
 
         if(ret != 0){
             return false;
         }
 #   elif (defined CC_PF_WIN32)
-	thread_t = (cc::thread_t)_beginthreadex(0, 0, pfunc, para, 0, 0);
+    thread = (cc::thread_t)_beginthreadex(0, 0, pfunc, para, 0, 0);
 #   endif
 #endif
 
