@@ -102,9 +102,27 @@ public:
     }
 
     inline void
-    functionSignature(const FunctionSignature& fs)
+    setFunctionSignature(const FunctionSignature& fs)
     {
         this->function_signature_ = fs;
+    }
+
+    inline void
+    setClangArgs(const std::string& args)
+    {
+        this->clang_args_ = args;
+    }
+
+    inline void
+    setFiles(const std::vector<std::string>& files)
+    {
+        this->files_ = files;
+    }
+
+    inline void
+    pushFiles(const std::string& file)
+    {
+        this->files_.push_back(file);
     }
 
     /*getOptions*/
@@ -182,6 +200,18 @@ public:
         return this->function_signature_;
     }
 
+    inline std::string
+    clangArgs() const
+    {
+        return this->clang_args_;
+    }
+
+    inline const std::vector<std::string>
+    files() const
+    {
+        return this->files_;
+    }
+
 public:
 //#ifdef FF_DEBUG
     void
@@ -215,6 +245,10 @@ private:
     int    threads_;
 
     FunctionSignature   function_signature_;
+
+    std::string clang_args_;
+
+    std::vector<std::string> files_;
 };
 
 NAMESPACE_FF_END
