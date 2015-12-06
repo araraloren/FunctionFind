@@ -8,11 +8,13 @@ It's not yet complete.
 
 ##Build Require
 
+ gcc 4.9 or clang 4.9
+
  cmake 3.3
  
- libclang
+ libclang 3.6
  
- llvm
+ llvm 3.6
 
 ## Installation
 
@@ -23,3 +25,5 @@ It's not yet complete.
   mkdir build && cd build
   
   cmake .. && make
+
+  ^_^ i'm not write cmake install yet.
