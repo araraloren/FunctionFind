@@ -3,10 +3,14 @@
 
 #include <string>
 #include <ctime>
+#include <cstring>
 #include <ffconfig.h>
 #include <fffunction.h>
+#include <ccpublic.h>
 
 NAMESPACE_FF_BEGIN
+
+const size_t FF_ARGV_MAX = 128;
 
 class FFOption
 {
@@ -30,7 +34,12 @@ private:
     FFOption();
     FFOption(const FFOption& );
     FFOption operator = (const FFOption&);
-    ~FFOption(){}
+    ~FFOption()
+    {
+        for (size_t i = 0;i < clang_args_cnt_;i ++) {
+            delete clang_args_[i];
+        }
+    }
 
     /*setOptions*/
 public:
@@ -110,7 +119,7 @@ public:
     inline void
     setClangArgs(const std::string& args)
     {
-        this->clang_args_ = args;
+        this->checkClangOptions(args);
     }
 
     inline void
@@ -200,7 +209,7 @@ public:
         return this->function_signature_;
     }
 
-    inline std::string
+    inline char* const *
     clangArgs() const
     {
         return this->clang_args_;
@@ -217,6 +226,24 @@ public:
     void
     debugPrintStatus() const;
 //#endif
+public:
+    void
+    checkClangOptions(const std::string& str)
+    {
+        if (clang_args_ != nullptr) {
+            return ;
+        }
+        std::vector<std::string> arglist = cc::spiltString(str, ',', cc::trim);
+
+        clang_args_cnt_ = arglist.size();
+        for (size_t i = 0;i < arglist.size();i ++) {
+            std::string &arg = arglist[i];
+
+            clang_args_[i] = new char[arg.size() + 1];
+            std::memcpy(clang_args_[i], arg.c_str(), arg.size());
+            clang_args_[arg.size()] = '\0';
+        }
+    }
 
     /*switch*/
 private:
@@ -246,7 +273,9 @@ private:
 
     FunctionSignature   function_signature_;
 
-    std::string clang_args_;
+    size_t clang_args_cnt_;
+
+    char* clang_args_[FF_ARGV_MAX];
 
     std::vector<std::string> files_;
 };
