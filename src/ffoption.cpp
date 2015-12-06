@@ -22,6 +22,9 @@ FFOption::FFOption()
     ,start_time_(0)
     ,end_time_(0)
     ,function_signature_()
+    ,clang_args_cnt_(0)
+    ,clang_args_()
+    ,files_()
 {
 
 }
@@ -41,6 +44,13 @@ FFOption::debugPrintStatus() const
     std::printf("\t%s: %d\n", FF_TO_SRTING(this->print_match_count_), this->print_match_count_);
     std::printf("\t%s: %ld\n", FF_TO_SRTING(this->start_time_), this->start_time_);
     std::printf("\t%s: %ld\n", FF_TO_SRTING(this->end_time_), this->end_time_);
+    //std::printf("\t%s: %s\n", FF_TO_SRTING(this->clang_args_), this->clang_args_.c_str());
+    std::printf("\t%s: [", FF_TO_SRTING(this->files_));
+    for (std::vector<std::string>::const_iterator cit = this->files_.begin();   \
+            cit != this->files_.end();cit ++) {
+        std::printf (" %s ", cit->c_str());
+    }
+    std::printf("]\n");
     std::printf("\t%s:{\n", FF_TO_SRTING(this->function_signature_));
     std::printf("\t\treturn type -> %s\n", this->function_signature_.returnType().c_str());
     std::printf("\t\tfunction name -> %s\n", this->function_signature_.functionName().c_str());
@@ -75,6 +85,7 @@ FFOption::parseCommandArgs(int argc, char **argv)
         {"start-time",      required_argument,  0, 'S'},
         {"end-time",        required_argument,  0, 'E'},
         {"threads-count",   required_argument,  0, 't'},
+        {"clang",           required_argument,  0,  'C'},
         /**/
         {"help",            no_argument,        0, 'h'},
         {"version",         no_argument,        0, 'v'},
@@ -110,6 +121,7 @@ FFOption::parseCommandArgs(int argc, char **argv)
         case 'S':{ this->setStartTime(std::atol(optarg)); } break;
         case 'E':{ this->setEndTime(std::atol(optarg)); } break;
         case 't':{ this->setThreadCount(std::atoi(optarg)); } break;
+        case 'C':{ this->setClangArgs(optarg); } break;
         /*************************************************/
         case 'h':
         case 'v':
@@ -125,6 +137,16 @@ FFOption::parseCommandArgs(int argc, char **argv)
             this->function_signature_.parseArgsType(args_type);
         }
     }
+
+    if (optind >= argc) {
+        return false;
+    }
+
+    while (optind < argc) {
+        this->pushFiles(std::string(argv[optind ++]));
+    }
+
+    this->checkClangOptions(std::string("-x,c++,-std=c++11"));
 
     return true;
 }
