@@ -4,7 +4,7 @@ compiler:
   - gcc
   
 before_install:
-- if [[ $CXX == g++ ]]; then sudo apt-get update && sudo apt-get install -y g++-4.9 && export CXX="g++-4.9" CC="gcc-4.9"; fi
+- if [[ $CXX == g++ ]]; then sudo apt-get update; sudo apt-get search "gcc"; fi
 
 before_script:
   - mkdir build
