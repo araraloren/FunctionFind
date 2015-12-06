@@ -17,10 +17,11 @@ set(SRC_LIST
     ./threadpool/thread.hpp
     ./threadpool/itask.h
 )
+exec_program(llvm-config . ARGS "--libdir" OUTPUT_VARIABLE LLVMLD)
 find_library(
     LIBCLANG
     clang
-    /usr/lib/llvm/ /usr/lib64/llvm /usr/local/lib/llvm /usr/local/lib64/llvm
+    ${LLVMLD}
 )
 set(LIBRARIES
     pthread
