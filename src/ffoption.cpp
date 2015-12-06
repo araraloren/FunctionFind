@@ -156,7 +156,7 @@ FFOption::printOptionHelp() const
 {
     static const char* s_help = FF_OPTION_HELP;
 
-    std::printf(s_help);
+    std::printf("%s", s_help);
 }
 
 
