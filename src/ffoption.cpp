@@ -22,6 +22,9 @@ FFOption::FFOption()
     ,start_time_(0)
     ,end_time_(0)
     ,function_signature_()
+    ,clang_args_cnt_(0)
+    ,clang_args_()
+    ,files_()
 {
 
 }
@@ -41,7 +44,7 @@ FFOption::debugPrintStatus() const
     std::printf("\t%s: %d\n", FF_TO_SRTING(this->print_match_count_), this->print_match_count_);
     std::printf("\t%s: %ld\n", FF_TO_SRTING(this->start_time_), this->start_time_);
     std::printf("\t%s: %ld\n", FF_TO_SRTING(this->end_time_), this->end_time_);
-    std::printf("\t%s: %s\n", FF_TO_SRTING(this->clang_args_), this->clang_args_.c_str());
+    //std::printf("\t%s: %s\n", FF_TO_SRTING(this->clang_args_), this->clang_args_.c_str());
     std::printf("\t%s: [", FF_TO_SRTING(this->files_));
     for (std::vector<std::string>::const_iterator cit = this->files_.begin();   \
             cit != this->files_.end();cit ++) {
@@ -142,6 +145,8 @@ FFOption::parseCommandArgs(int argc, char **argv)
     while (optind < argc) {
         this->pushFiles(std::string(argv[optind ++]));
     }
+
+    this->checkClangOptions(std::string("-x,c++,-std=c++11"));
 
     return true;
 }
