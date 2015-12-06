@@ -8,9 +8,13 @@ find c/c++ function in source or header file.
 
 It's not yet complete.
 
-build require: cmake 3.3
+##Build Require
 
-get && install:
+ cmake 3.3
+ 
+ libclang
+
+## Installation
 
   git clone git@github.com:araraloren/FunctionFind.git
   
