@@ -18,6 +18,7 @@ set(SRC_LIST
     ./threadpool/itask.h
 )
 exec_program(llvm-config . ARGS "--libdir" OUTPUT_VARIABLE LLVMLD)
+exec_program(llvm-config . ARGS "--includedir" OUTPUT_VARIABLE LLVMIN)
 find_library(
     LIBCLANG
     clang
@@ -33,6 +34,7 @@ include_directories(
     ./cc/
     ./cpplogger/
     ./threadpool/
+    ${LLVMIN}
 )
 aux_source_directory(. SRC_LIST)
 add_executable(${PROJECT_NAME} ${SRC_LIST})
