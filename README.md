@@ -11,6 +11,8 @@ It's not yet complete.
  cmake 3.3
  
  libclang
+ 
+ llvm
 
 ## Installation
 
