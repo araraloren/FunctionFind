@@ -230,7 +230,7 @@ public:
     void
     checkClangOptions(const std::string& str)
     {
-        if (clang_args_ != nullptr) {
+        if (clang_args_cnt_ > 0) {
             return ;
         }
         std::vector<std::string> arglist = cc::spiltString(str, ',', cc::trim);
@@ -241,7 +241,7 @@ public:
 
             clang_args_[i] = new char[arg.size() + 1];
             std::memcpy(clang_args_[i], arg.c_str(), arg.size());
-            clang_args_[arg.size()] = '\0';
+            *clang_args_[arg.size()] = '\0';
         }
     }
 

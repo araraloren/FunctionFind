@@ -1,6 +1,6 @@
 project(FunctionFind)
 cmake_minimum_required(VERSION 2.8)
-set(CMAKE_CXX_FLAGS "-std=c++11 -g")
+set(CMAKE_CXX_FLAGS "-std=c++11 -Wall -Wextra -Werror")
 set(CMAKE_CXX_FLAGS_DEBUG "-std=c++11 -g -Wall -Wextra -Werror")
 set(CMAKE_CXX_FLAGS_RELEASE "-std=c++11 -Os -Wall -Wextra -Werror")
 set(SRC_LIST
