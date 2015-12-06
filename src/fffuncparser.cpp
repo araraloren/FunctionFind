@@ -8,19 +8,25 @@ using namespace ff;
 
 FuncParser::FuncParser(int argc, const char ** argv)
     :m_index(clang_createIndex(0, 0))
-    ,m_tunit()
+    ,m_tu()
     ,m_argc(argc)
     ,m_argv(argv)
     ,m_func_list()
     ,m_file()
 {
-
+    this->registerKind(CXCursor_FunctionDecl);
+    this->registerKind(CXCursor_FunctionTemplate);
+    this->registerKind(CXCursor_CXXMethod);
+    this->registerKind(CXCursor_Constructor);
+    this->registerKind(CXCursor_Destructor);
+    this->registerKind(CXCursor_ConversionFunction);
+    this->registerKind(CXCursor_ClassDecl);
+    this->registerKind(CXCursor_StructDecl);
 }
 
 FuncParser::~FuncParser()
 {
-    clang_disposeIndex(this->m_index);
-    clang_disposeTranslationUnit(this->m_tunit);
+
 }
 
 bool
@@ -30,59 +36,58 @@ FuncParser::parse(const std::string &file)
         return false;
     }
 
-    this->m_file = file;
+    m_file = file;
 
     return this->startParse();
 }
 
 void FuncParser::unregisterKind(CXCursorKind kind)
 {
-    for (std::vector<CXCursorKind>::iterator it = this->m_kind.begin();
-            it != this->m_kind.end();it ++) {
-        if (*it == kind) {
-            this->m_kind.erase(it);
-            break;
-        }
-    }
+    m_kind.erase(kind);
 }
 
 bool
 FuncParser::startParse()
 {
-    this->m_tunit = clang_parseTranslationUnit(this->m_index,
-                                               this->m_file.c_str(),
-                                               this->m_argv,
-                                               this->m_argc,
-                                               nullptr,
-                                               0,
-                                               CXTranslationUnit_None);
+    m_tu = clang_parseTranslationUnit(
+            m_index,
+            m_file.c_str(),
+            m_argv,
+            m_argc,
+            nullptr,
+            0,
+            CXTranslationUnit_None
+    );
 
-    CXCursor cursor = clang_getTranslationUnitCursor(this->m_tunit);
+    CXCursor cursor = clang_getTranslationUnitCursor(m_tu);
 
     int ret = clang_visitChildren(cursor, FuncParser::FP_vistor, CXClientData(this));
 
     return bool(ret == 0);
 }
 
-void
+CXChildVisitResult
 FuncParser::visitCursor(CXCursor cursor)
 {
     CXCursorKind kind = clang_getCursorKind(cursor);
 
-#ifndef FF_DEBUG
     if (this->filterKind(kind)) {
-        return ;
+        return CXChildVisit_Continue;
     }
-#endif
 
-    CXString str = clang_getCursorKindSpelling(kind);
+    switch(kind) {
+        case CXCursor_FunctionDecl: { }
+        case CXCursor_FunctionTemplate: { }
+        case CXCursor_CXXMethod: { }
+        case CXCursor_Constructor: { }
+        case CXCursor_Destructor: { }
+        case CXCursor_ConversionFunction: { }
+        case CXCursor_ClassDecl: { }
+        case CXCursor_StructDecl: { }
+        default: {   }
+    }
 
-    FF_AVOID_WARNING(str);
-    //add parser cpp or header file
-
-#ifdef FF_DEBUG
-    std::fprintf(stderr, "CursorKind:%s\n", clang_getCString(str));
-#endif
+    return CXChildVisit_Continue;
 }
 
 CXChildVisitResult
@@ -92,22 +97,12 @@ FuncParser::FP_vistor(CXCursor cursor, CXCursor parent, CXClientData data)
 
     FuncParser* fp = static_cast<FuncParser*>(data);
 
-    fp->visitCursor(cursor);
-
-    return CXChildVisit_Continue;
+    return fp->visitCursor(cursor);
 }
 
 bool
 FuncParser::filterKind(CXCursorKind kind)
 {
-    for (std::vector<CXCursorKind>::iterator it = this->m_kind.begin();
-            it != this->m_kind.end();it ++) {
-        if (*it == kind) {
-            return false;
-        }
-    }
-
-    return true;
+    return m_kind.count(kind) > 0;
 }
-
 
