@@ -11,20 +11,20 @@
 using namespace ff;
 
 FFOption::FFOption()
-    :ignore_name_(false)
-    ,ignore_ret_type_(false)
-    ,regex_(false)
-    ,recursion_(false)
-    ,find_declare_(false)
-    ,print_filename_(true)
-    ,print_line_num_(false)
-    ,print_match_count_(false)
-    ,start_time_(0)
-    ,end_time_(0)
-    ,function_signature_()
-    ,clang_args_cnt_(0)
-    ,clang_args_()
-    ,files_()
+    :m_ignore_name(false)
+    ,m_ignore_ret(false)
+    ,m_regex(false)
+    ,m_recursion(false)
+    ,m_declare(false)
+    ,m_print_fn(true)
+    ,m_print_ln(false)
+    ,m_print_mc(false)
+    ,m_start(0)
+    ,m_end(0)
+    ,m_signature()
+    ,m_args_c(0)
+    ,m_args()
+    ,m_files()
 {
 
 }
@@ -34,29 +34,29 @@ void
 FFOption::debugPrintStatus() const
 {
     std::printf("FFOption{\n");
-    std::printf("\t%s: %d\n", FF_TO_SRTING(this->ignore_name_), this->ignore_name_);
-    std::printf("\t%s: %d\n", FF_TO_SRTING(this->ignore_ret_type_), this->ignore_ret_type_);
-    std::printf("\t%s: %d\n", FF_TO_SRTING(this->regex_), this->regex_);
-    std::printf("\t%s: %d\n", FF_TO_SRTING(this->recursion_), this->recursion_);
-    std::printf("\t%s: %d\n", FF_TO_SRTING(this->find_declare_), this->find_declare_);
-    std::printf("\t%s: %d\n", FF_TO_SRTING(this->print_filename_), this->print_filename_);
-    std::printf("\t%s: %d\n", FF_TO_SRTING(this->print_line_num_), this->print_line_num_);
-    std::printf("\t%s: %d\n", FF_TO_SRTING(this->print_match_count_), this->print_match_count_);
-    std::printf("\t%s: %ld\n", FF_TO_SRTING(this->start_time_), this->start_time_);
-    std::printf("\t%s: %ld\n", FF_TO_SRTING(this->end_time_), this->end_time_);
-    //std::printf("\t%s: %s\n", FF_TO_SRTING(this->clang_args_), this->clang_args_.c_str());
-    std::printf("\t%s: [", FF_TO_SRTING(this->files_));
-    for (std::vector<std::string>::const_iterator cit = this->files_.begin();   \
-            cit != this->files_.end();cit ++) {
+    std::printf("\t%s: %d\n", FF_TO_SRTING(this->m_ignore_name), this->m_ignore_name);
+    std::printf("\t%s: %d\n", FF_TO_SRTING(this->m_ignore_ret), this->m_ignore_ret);
+    std::printf("\t%s: %d\n", FF_TO_SRTING(this->m_regex), this->m_regex);
+    std::printf("\t%s: %d\n", FF_TO_SRTING(this->m_recursion), this->m_recursion);
+    std::printf("\t%s: %d\n", FF_TO_SRTING(this->m_declare), this->m_declare);
+    std::printf("\t%s: %d\n", FF_TO_SRTING(this->m_print_fn), this->m_print_fn);
+    std::printf("\t%s: %d\n", FF_TO_SRTING(this->m_print_ln), this->m_print_ln);
+    std::printf("\t%s: %d\n", FF_TO_SRTING(this->m_print_mc), this->m_print_mc);
+    std::printf("\t%s: %ld\n", FF_TO_SRTING(this->m_start), this->m_start);
+    std::printf("\t%s: %ld\n", FF_TO_SRTING(this->m_end), this->m_end);
+    //std::printf("\t%s: %s\n", FF_TO_SRTING(this->m_args), this->m_args.c_str());
+    std::printf("\t%s: [", FF_TO_SRTING(this->m_files));
+    for (std::vector<std::string>::const_iterator cit = this->m_files.begin();   \
+            cit != this->m_files.end();cit ++) {
         std::printf (" %s ", cit->c_str());
     }
     std::printf("]\n");
-    std::printf("\t%s:{\n", FF_TO_SRTING(this->function_signature_));
-    std::printf("\t\treturn type -> %s\n", this->function_signature_.returnType().c_str());
-    std::printf("\t\tfunction name -> %s\n", this->function_signature_.functionName().c_str());
-    std::printf("\t\targment list -> %lu[", this->function_signature_.argsType().size());
-    for (std::vector<std::string>::const_iterator sit = this->function_signature_.argsType().begin();  \
-         sit != this->function_signature_.argsType().end();sit ++) {
+    std::printf("\t%s:{\n", FF_TO_SRTING(this->m_signature));
+    std::printf("\t\treturn type -> %s\n", this->m_signature.m_ret.c_str());
+    std::printf("\t\tfunction name -> %s\n", this->m_signature.m_name.c_str());
+    std::printf("\t\targment list -> %lu[", this->m_signature.m_args.size());
+    for (std::vector<std::string>::const_iterator sit = this->m_signature.m_args.begin();  \
+         sit != this->m_signature.m_args.end();sit ++) {
         std::printf(" %s ", sit->c_str());
     }
     std::printf("]\n\t}\n}\n");
@@ -104,18 +104,18 @@ FFOption::parseCommandArgs(int argc, char **argv)
             break;
         }
         switch (opt) {
-        case 'N':{ this->ignore_name_ = true; } break;
-        case 'Y':{ this->ignore_ret_type_ = true; } break;
-		case 'G':{ this->regex_ = true; } break;
-        case 'R':{ this->recursion_ = true; } break;
-        case 'D':{ this->find_declare_ = true; } break;
-        case 'f':{ this->print_filename_ = true; } break;
-        case 'n':{ this->print_line_num_ = true; } break;
-            //when we set print_match_count_ true
-            //we need check print_filename_
-        case 'c':{ this->print_match_count_ = true; } break;
+        case 'N':{ this->m_ignore_name = true; } break;
+        case 'Y':{ this->m_ignore_ret = true; } break;
+        case 'G':{ this->m_regex = true; } break;
+        case 'R':{ this->m_recursion = true; } break;
+        case 'D':{ this->m_declare = true; } break;
+        case 'f':{ this->m_print_fn = true; } break;
+        case 'n':{ this->m_print_ln = true; } break;
+            //when we set m_print_mc true
+            //we need check m_print_fn
+        case 'c':{ this->m_print_mc = true; } break;
         /**************************************************/
-        case 's':{ this->function_signature_.parseSignature(optarg); } break;
+        case 's':{ this->m_signature.parseSignature(optarg); } break;
         case 'r':{ ret_type = optarg; } break;
         case 'a':{ args_type = optarg; } break;
         case 'S':{ this->setStartTime(std::atol(optarg)); } break;
@@ -129,12 +129,12 @@ FFOption::parseCommandArgs(int argc, char **argv)
         }
     }
 
-    if (this->function_signature_ == FunctionSignature()) {
+    if (this->m_signature == FunctionSignature()) {
         if (!ret_type.empty()) {
-            this->function_signature_.parseRetType(ret_type);
+            this->m_signature.parseRetType(ret_type);
         }
         if (!args_type.empty()) {
-            this->function_signature_.parseArgsType(args_type);
+            this->m_signature.parseArgsType(args_type);
         }
     }
 
