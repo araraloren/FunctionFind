@@ -6,6 +6,8 @@
 #endif
 #ifdef CC_PF_LINUX
 #   include <errno.h>
+#   include <dirent.h>
+#   include <sys/stat.h>
 #endif
 
 #include <cctype>
@@ -19,8 +21,8 @@
 #if (defined CC_PF_WIN32) || ((defined CC_PF_MINGW32) && (!defined _GLIBCXX_USE_NANOSLEEP))
 
 struct timespec {
-	time_t  tv_sec;	/* Seconds */
-	long    tv_nsec;	/* Nanoseconds */
+    time_t  tv_sec;	/* Seconds */
+    long    tv_nsec;	/* Nanoseconds */
 };
 
 
@@ -32,40 +34,40 @@ struct timespec {
 static int
 s_nanosleep (const struct timespec *req, struct timespec *rem)
 {
-		HANDLE timer = NULL;
-		LARGE_INTEGER sleepTime;
+        HANDLE timer = NULL;
+        LARGE_INTEGER sleepTime;
 
-		sleepTime.QuadPart = req->tv_sec * 1000000000 + req->tv_nsec / 100;
+        sleepTime.QuadPart = req->tv_sec * 1000000000 + req->tv_nsec / 100;
 
-		timer = CreateWaitableTimer (NULL, TRUE, NULL);
-		if (timer == NULL)
-		{
-				//LPVOID buffer = NULL;
-				//FormatMessage (FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM, NULL,
-				//                                GetLastError(), 0, (LPTSTR) &buffer, 0, NULL);
-				//PLAYER_ERROR2 ("nanosleep: CreateWaitableTimer failed: (%d) %s\n",
-				//                                GetLastError (), (LPTSTR) buffer);
-				//LocalFree (buffer);
-				return -1;
-		}
+        timer = CreateWaitableTimer (NULL, TRUE, NULL);
+        if (timer == NULL)
+        {
+                //LPVOID buffer = NULL;
+                //FormatMessage (FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM, NULL,
+                //                                GetLastError(), 0, (LPTSTR) &buffer, 0, NULL);
+                //PLAYER_ERROR2 ("nanosleep: CreateWaitableTimer failed: (%d) %s\n",
+                //                                GetLastError (), (LPTSTR) buffer);
+                //LocalFree (buffer);
+                return -1;
+        }
 
-		if (!SetWaitableTimer (timer, &sleepTime, 0, NULL, NULL, 0))
-		{
-				return -1;
-		}
+        if (!SetWaitableTimer (timer, &sleepTime, 0, NULL, NULL, 0))
+        {
+                return -1;
+        }
 
-		if (WaitForSingleObject (timer, INFINITE) != WAIT_OBJECT_0)
-		{
-				return -1;
-		}
+        if (WaitForSingleObject (timer, INFINITE) != WAIT_OBJECT_0)
+        {
+                return -1;
+        }
 
-		return 0;
+        return 0;
 }
 
 static int
 nanosleep(const struct timespec *req, struct timespec *rem)
 {
-	return s_nanosleep(rep, rem);
+    return s_nanosleep(rep, rem);
 }
 
 #endif
@@ -79,20 +81,20 @@ void
 cc::microSleep(int micro_seconds)
 {
 #if __cplusplus >= 201103L
-	std::this_thread::sleep_for(std::chrono::microseconds(micro_seconds));
+    std::this_thread::sleep_for(std::chrono::microseconds(micro_seconds));
 #else//c++11
-		struct timespec rep, rem;
+        struct timespec rep, rem;
 
-		rep.tv_sec  = micro_seconds / 1000000;
-		rem.tv_nsec = micro_seconds % 1000000;
+        rep.tv_sec  = micro_seconds / 1000000;
+        rem.tv_nsec = micro_seconds % 1000000;
 
 #   if (defined CC_PF_LINUX) || ((defined CC_PF_MINGW32) && (defined _GLIBCXX_USE_NANOSLEEP))
-		while(nanosleep(&rep, &rem) == -1 && errno == EINTR){
+        while(nanosleep(&rep, &rem) == -1 && errno == EINTR){
 #   else
-		while(nanosleep(&rep, &rem) == -1){
+        while(nanosleep(&rep, &rem) == -1){
 #   endif//nanosleep
-			rep = rem;
-		}
+            rep = rem;
+        }
 #endif//c++11
 }
 
@@ -103,23 +105,23 @@ cc::microSleep(int micro_seconds)
 std::string &
 cc::formatPath(std::string &path)
 {
-	if(path.empty()){
-		return path;
-	}
+    if(path.empty()){
+        return path;
+    }
 
     std::string::iterator it = path.begin();
 
-	for(;it != path.end();it ++){
-		if(*it == '\\'){
-			*it = '/';
-		}
-	}
+    for(;it != path.end();it ++){
+        if(*it == '\\'){
+            *it = '/';
+        }
+    }
 
-	if(*(it - 1) != '/'){
-		path.push_back('/');
-	}
+    if(*(it - 1) != '/'){
+        path.push_back('/');
+    }
 
-	return path;
+    return path;
 }
 
 
@@ -129,21 +131,21 @@ cc::getLocalTimeStr(const std::string &format)
     const size_t CONST_BUFF_LEN = 256;
 
     time_t      cur_time = std::time(0);
-	struct tm	local_time;
+    struct tm	local_time;
 
 #if (defined CC_PF_MINGW32) || (defined CC_PF_WIN32)
-	if(localtime_s(&local_time, &cur_time) != 0){
+    if(localtime_s(&local_time, &cur_time) != 0){
         return string("");
-	}
+    }
 #elif (defined CC_PF_LINUX)
-	if(localtime_r(&cur_time, &local_time) == 0){
+    if(localtime_r(&cur_time, &local_time) == 0){
         return string("");
-	}
+    }
 #endif
 
-	char time_buff[CONST_BUFF_LEN];
+    char time_buff[CONST_BUFF_LEN];
 
-	std::strftime(time_buff, CONST_BUFF_LEN - 1, format.c_str(), &local_time);
+    std::strftime(time_buff, CONST_BUFF_LEN - 1, format.c_str(), &local_time);
 
     return string(time_buff);
 }
@@ -152,84 +154,84 @@ cc::getLocalTimeStr(const std::string &format)
 bool
 cc::accessFile(const std::string &file, int mode)
 {
-	bool ret = true;
+    bool ret = true;
 
 #ifdef CC_PF_LINUX
-	if(access(file.c_str(), mode) != 0){
-		return false;
-	}
+    if(access(file.c_str(), mode) != 0){
+        return false;
+    }
 #elif (defined CC_PF_MINGW32)
-	if(access(file.c_str(), mode) != 0){
-		return false;
-	}
+    if(access(file.c_str(), mode) != 0){
+        return false;
+    }
 #elif (defined CC_PF_WIN32)
-	if (_access(file.c_str(), mode) != 0){
-		return false;
-	}
+    if (_access(file.c_str(), mode) != 0){
+        return false;
+    }
 #endif
 
-	return ret;
+    return ret;
 }
 
 
 bool
 cc::createDirectory(const std::string &directory)
 {
-	if(directory.empty()){
-		return true;
-	}
+    if(directory.empty()){
+        return true;
+    }
 
-	bool ret = true;
+    bool ret = true;
 
     string::const_iterator last = directory.begin();
 
     string::const_iterator start = last;
 
-	if(*last == '/'){
-		++ last;
-	}else if(*last == '.' && directory.size() >= 2){
-		last += 2;
-	}
+    if(*last == '/'){
+        ++ last;
+    }else if(*last == '.' && directory.size() >= 2){
+        last += 2;
+    }
 
     string path(directory.size(), '\0');
 
     string::iterator path_it = path.begin();
 
-	for(;last != directory.end();++ last){
-		if(*last == '/'){
-			path_it = std::copy(start, last + 1, path_it);
+    for(;last != directory.end();++ last){
+        if(*last == '/'){
+            path_it = std::copy(start, last + 1, path_it);
 
 #ifdef CC_PF_LINUX
-			if(mkdir(path.c_str(), 0777) != 0){
-				return false;
-			}
+            if(mkdir(path.c_str(), 0777) != 0){
+                return false;
+            }
 #elif (defined CC_PF_MINGW32)
-			if (mkdir(path.c_str()) != 0){
-				return false;
-			}
+            if (mkdir(path.c_str()) != 0){
+                return false;
+            }
 #elif (defined CC_PF_WIN32)
-			if (_mkdir(path.c_str()) != 0){
-				return false;
-			}
+            if (_mkdir(path.c_str()) != 0){
+                return false;
+            }
 #endif
 
-			start = last + 1;
-		}
-	}
+            start = last + 1;
+        }
+    }
 
-	return ret;
+    return ret;
 }
 
 #if __cplusplus >= 201103L
 void
 cc::printf(std::ostream& out, const char* s)
 {
-	while (*s) {
-		if (*s=='%' && *++s!='%')   // make sure that there wasn't meant to be more arguments
-						// %% represents plain % in a format string
-			 throw std::runtime_error("invalid format: missing arguments");
-		out << *s++;
-	}
+    while (*s) {
+        if (*s=='%' && *++s!='%')   // make sure that there wasn't meant to be more arguments
+                        // %% represents plain % in a format string
+             throw std::runtime_error("invalid format: missing arguments");
+        out << *s++;
+    }
 }
 
 #endif
@@ -318,7 +320,7 @@ cc::spiltString(const std::string &str, const std::string &sep, cc::format_func 
 
 std::string
 cc::trim(const std::string &str)
-{
+{//may be implement by a static whitespace table
     std::string::size_type beg = 0;
     std::string::size_type end = str.length() - 1;
 
@@ -341,3 +343,163 @@ cc::trim(const std::string &str)
     return str.substr(beg, end - beg + 1);
 }
 
+
+const char *
+cc::getExtname(const char *filename)
+{
+    if (!filename) return nullptr;
+
+    const char* pext = nullptr;
+
+    if (!(pext = std::strrchr(filename, '.'))) {
+        return nullptr;
+    }
+    else {
+        return pext++;
+    }
+}
+
+const char *
+cc::getExtname(const char *filename, size_t len)
+{
+    if (!filename || !len) return nullptr;
+
+    const char* pext = nullptr;
+
+    for (;len > 0;len --) {
+        if (*(pext + len - 1) == '.') {
+            return pext + len - 1;
+        }
+    }
+
+    return nullptr;
+}
+
+std::string
+cc::getExtname(const std::string &filename)
+{
+    std::string::size_type pos = 0;
+
+    pos = filename.rfind('.');
+    if (pos == std::string::npos) {
+        return std::string();
+    }
+    else {
+        return filename.substr(pos + 1);
+    }
+}
+
+namespace {
+
+const static size_t SEARCH_PATH_LENGTH = 1024;
+
+using std::strcmp;
+
+    inline const char* checkExtname(const char* extname)
+    {
+        return strcmp(extname, "*") == 0 ? nullptr : extname;
+    }
+
+    // extname -> "ext" or ""(no extname) or nullptr
+    void
+    searchDirectoryExtname(const char* directory, std::vector<std::string>& files, bool subdir, const char*  extname)
+    {
+        DIR* pdir = nullptr;
+
+        if ((pdir = opendir(directory)) == nullptr) {
+            return;
+        }
+
+        struct dirent entry;
+        struct dirent *res;
+
+        struct stat fstat;
+
+        const char* name;
+
+        char curpath[SEARCH_PATH_LENGTH];
+
+        while (readdir_r(pdir, &entry, &res) == 0 && res) {
+            name = entry.d_name;
+
+            if (strcmp(name, ".") == 0 || strcmp(name, "..") == 0) {
+                continue;
+            }
+
+            int count = std::snprintf(curpath, SEARCH_PATH_LENGTH, "%s", directory);
+
+            count += std::snprintf(&curpath[count], SEARCH_PATH_LENGTH - count, "%s%s", \
+                                   curpath[count - 1] == '/' ? "" : "/", name);
+
+            if (lstat(curpath, &fstat) != -1) {
+                if (!S_ISDIR(fstat.st_mode)) {
+                    if (!extname) {
+                        files.push_back(std::string(curpath, count));
+                    } else {
+                        const char *e = std::strrchr(curpath, '.');
+
+                        if (e != nullptr && strcmp(e + 1, extname) == 0) {
+                            files.push_back(std::string(curpath, count));
+                        } else if ((e == nullptr && *extname == 0)) {
+                            files.push_back(std::string(curpath, count));
+                        }
+                    }
+                } else if (subdir) {
+                    searchDirectoryExtname(curpath, files, subdir, extname);
+                }
+            }
+        }
+
+        closedir(pdir);
+    }
+}
+
+std::vector<std::string>
+cc::searchDirectory(const std::string &directory)
+{
+    std::vector<std::string> files;
+
+    searchDirectoryExtname(directory.c_str(), files, false, nullptr);
+
+    return files;
+}
+
+std::vector<std::string>
+cc::searchDirectory(const std::string &directory, bool recursive)
+{
+    std::vector<std::string> files;
+
+    searchDirectoryExtname(directory.c_str(), files, recursive, nullptr);
+
+    return files;
+}
+
+std::vector<std::string>
+cc::searchDirectory(const std::string &directory, const char *extname)
+{
+    std::vector<std::string> files;
+
+    searchDirectoryExtname(directory.c_str(), files, false, checkExtname(extname));
+
+    return files;
+}
+
+std::vector<std::string>
+cc::searchDirectory(const std::string &directory, bool recursive, const char *extname)
+{
+    std::vector<std::string> files;
+
+    searchDirectoryExtname(directory.c_str(), files, recursive, checkExtname(extname));
+
+    return files;
+}
+
+std::vector<std::string>
+cc::searchDirectory(const char *directory, bool recursive, const char *extname)
+{
+    std::vector<std::string> files;
+
+    searchDirectoryExtname(directory, files, recursive, checkExtname(extname));
+
+    return files;
+}

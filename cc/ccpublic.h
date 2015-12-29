@@ -49,10 +49,10 @@ getLocalTimeStr(const string& format);
  * 判断文件的状态
 */
 #if (defined CC_PF_LINUX) || (defined CC_PF_MINGW32)
-	//#define	R_OK	4		/* Test for read permission.  */
-	//#define	W_OK	2		/* Test for write permission.  */
-	//#define	X_OK	1		/* Test for execute permission.  */
-	//#define	F_OK	0		/* Test for existence.  */
+    //#define	R_OK	4		/* Test for read permission.  */
+    //#define	W_OK	2		/* Test for write permission.  */
+    //#define	X_OK	1		/* Test for execute permission.  */
+    //#define	F_OK	0		/* Test for existence.  */
 #else
 #	define	R_OK	4		/* Test for read permission.  */
 #	define	W_OK	2		/* Test for write permission.  */
@@ -224,15 +224,15 @@ template<typename T, typename... Args>      // note the "..."
 void
 printf(std::ostream& out, const char* s, T& value, Args... args)   // note the "..."
 {
-	while (*s) {
-		if (*s=='%' && *++s!='%') { // a format specifier (ignore which one it is)
-			out << value;     // use first non-format argument
+    while (*s) {
+        if (*s=='%' && *++s!='%') { // a format specifier (ignore which one it is)
+            out << value;     // use first non-format argument
             return printf(out, *s ? ++s : s, args ...);    // "peel off" first argument
-		}
-		out << *s++;
-	}
+        }
+        out << *s++;
+    }
 
-	throw std::runtime_error("extra arguments provided to printf");
+    throw std::runtime_error("extra arguments provided to printf");
 }
 
 /*
@@ -242,7 +242,7 @@ template <typename T>
 void
 print(std::ostream& out, T& s)
 {
-	out <<s;
+    out <<s;
 }
 
 template<typename T, typename... Args>
@@ -250,7 +250,7 @@ void
 print(std::ostream& out, T& value, Args... args)
 {
     out <<value;
-	print(out, args ...);
+    print(out, args ...);
 }
 /*
  * 递归的将args里面的数据输出到out里面
@@ -275,6 +275,34 @@ println(std::ostream& out, T& value, Args... args)
 
 std::string
 trim(const std::string& str);
+
+const char*
+getExtname(const char* filename);
+
+const char*
+getExtname(const char* filename, size_t len);
+
+std::string
+getExtname(const std::string& filename);
+
+/*
+ * search directory
+*/
+// extname -> "*" or "ext" or ""(no extname)
+std::vector<std::string>
+searchDirectory(const std::string& directory);
+
+std::vector<std::string>
+searchDirectory(const std::string& directory, bool recursive);
+
+std::vector<std::string>
+searchDirectory(const std::string &directory, const char* extname);
+
+std::vector<std::string>
+searchDirectory(const std::string& directory, bool recursive, const char* extname);
+
+std::vector<std::string>
+searchDirectory(const char* directory, bool recursive, const char* extname);
 
 ccNamespaceEnd(cc)
 
