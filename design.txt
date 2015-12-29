@@ -2,6 +2,8 @@ functionfind, [ff]:
 
 [ff] [type switch] [files] [switch] [option] [function signature]
 
+--files may be from std input 
+
 type switch:
 	-f => function,
 	-d => declare
@@ -22,7 +24,7 @@ switch:
 	-h, --help => print help of [ff],
 	-v, --version => print version of [ff],
 	
-	--only-count => only print match count, [will disable -n -o -c]
+	--only-count => only print match count, [will forbidden -n -o -c, but you can use -f]
 	
 option:
 	--start-time => start time limit of file
