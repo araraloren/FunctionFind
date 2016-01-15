@@ -25,7 +25,7 @@ public:
     parse(const std::string& file);
 
     Function
-    match(const FunctionSignature& fs);
+    match(const Signature& fs);
 
     void
     registerKind(CXCursorKind kind)

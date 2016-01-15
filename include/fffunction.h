@@ -6,186 +6,122 @@
 #include <ccpublic.h>
 #include <ffconfig.h>
 
+using std::string;
+using std::vector;
+
 NAMESPACE_FF_BEGIN
 
-struct FunctionSignature
-{
-    /**
-     * @brief m_ret
-     */
-    std::string m_ret;
+enum Type {
+    T_None,
+    T_Any,
+    T_Void,
+    T_Template,
+    T_Type,
+    T_Normal,
+};
 
-    /**
-     * @brief m_name
-     */
-    std::string m_name;
+struct VarType {
+    Type    type; // var type
+    string  type_name; // type name
+    string  name; // var name
 
-    /**
-     * @brief m_args
-     */
-    std::vector<std::string> m_args;
+    VarType()
+        :type(T_None)
+        ,type_name()
+        ,name()
+    {}
 
-    /**
-     * @brief FunctionSignature
-     */
-    FunctionSignature()
-        : m_ret(),
-          m_name(),
-          m_args()
-    { }
+    VarType(Type type, const string& type_name, const string& var_name)
+        :type(type)
+        ,type_name(type_name)
+        ,name(var_name)
+    {}
 
-    /**
-     * @brief FunctionSignature
-     * @param ret_type
-     * @param args_type
-     * @param function_name
-     */
-    explicit FunctionSignature(const std::string& ret_type,  \
-                        const std::vector<std::string>& args_type,  \
-                        const std::string& function_name = std::string())
-        : m_ret(ret_type),
-          m_name(function_name),
-          m_args(args_type)
-    { }
+    VarType(Type type, const std::string &type_name)
+        :type(type)
+        ,type_name(type_name)
+        ,name()
+    {}
+};
 
-    /**
-     * @brief parseSignature
-     * @param signature
-     */
-    void
-    parseSignature(const std::string& signature)
+typedef VarType ReturnType;
+typedef VarType ArgumentType;
+
+struct ArgList {
+    Type    type;
+    vector<ArgumentType> list;
+
+    ArgList()
+        :type(T_None)
+        ,list()
+    {}
+
+    ArgList(Type type, const vector<ArgumentType>& arglist)
+        :type(type)
+        ,list(arglist)
+    {}
+};
+
+struct FuncName {
+    Type    type;
+    string  name;
+
+    FuncName()
+        :type(T_None)
+        ,name()
+    {}
+
+    FuncName(Type type, const string& name)
+        :type(type)
+        ,name(name)
+    {}
+};
+
+struct Signature {
+    ReturnType  return_type;
+    ArgList     arg_list;
+    FuncName    func_name;
+
+    Signature()
+        :return_type()
+        ,arg_list()
+        ,func_name()
+    {}
+
+    Signature(const ReturnType& return_type, const ArgList& arg_list, const FuncName& func_name)
+        :return_type(return_type)
+        ,arg_list(arg_list)
+        ,func_name(func_name)
+    {}
+
+    bool isNone() const
     {
-        //add parser signature [type (type)]
-        std::string::size_type pos = 0;
-
-        pos = signature.find('(');
-        if (std::string::npos == pos) {
-            //signature = arg type, .... -> ret type
-            pos = signature.rfind("->");
-
-            if (std::string::npos == pos) {
-                return;
-            } else {
-                this->m_args = cc::spiltString(signature.substr(0, pos), ',', cc::trim);
-                this->m_ret  = signature.substr(pos + 2);
-            }
-        } else {
-            //signature = ret type(arg type, ...)
-            std::string::size_type rpos = 0;
-
-            this->m_ret = signature.substr(0, pos);
-            if (std::string::npos == (rpos = signature.rfind(')'))) {
-                this->m_args = cc::spiltString(signature.substr(pos + 1), ',', cc::trim);
-            } else {
-                this->m_args = cc::spiltString(signature.substr(pos + 1, rpos - pos - 1), ',', cc::trim);
-            }
-        }
-    }
-
-    /**
-     * @brief parseRetType
-     * @param ret_type
-     */
-    void
-    parseRetType(const std::string& ret_type)
-    {
-        this->m_ret = ret_type;
-    }
-
-    /**
-     * @brief parseArgsType
-     * @param args_type
-     */
-    void
-    parseArgsType(const std::string& args_type)
-    {
-        //split argstype with ','
-        this->m_args = cc::spiltString(args_type, ',', cc::trim);
-    }
-
-    /**
-     * @brief argsTypeIsEqual
-     * @param fs
-     * @return
-     */
-    bool
-    argsTypeIsEqual(const FunctionSignature& fs) const
-    {
-        return fs.m_args == this->m_args;
-    }
-
-    /**
-     * @brief retTypeIsEqual
-     * @param fs
-     * @return
-     */
-    bool
-    retTypeIsEqual(const FunctionSignature& fs) const
-    {
-        return fs.m_ret == this->m_ret;
-    }
-
-    /**
-     * @brief functionNameIsEqual
-     * @param fs
-     * @return
-     */
-    bool
-    functionNameIsEqual(const FunctionSignature& fs) const
-    {
-        return fs.m_name == this->m_name;
-    }
-
-    /**
-     * @brief signatureIsEqual
-     * @param fs
-     * @return
-     */
-    bool
-    signatureIsEqual(const FunctionSignature& fs) const
-    {
-        return argsTypeIsEqual(fs) && retTypeIsEqual(fs);
-    }
-
-    /**
-     * @brief operator ==
-     * @param fs
-     * @return
-     */
-    bool
-    operator ==(const FunctionSignature& fs) const
-    {
-        return argsTypeIsEqual(fs) && retTypeIsEqual(fs) && functionNameIsEqual(fs);
-    }
-
-    /**
-     * @brief operator !=
-     * @param fs
-     * @return
-     */
-    bool
-    operator !=(const FunctionSignature& fs) const
-    {
-        return !(this->operator ==(fs));
+        return return_type.type == T_None && arg_list.type == T_None && func_name.type == T_None;
     }
 };
 
-struct Function{
-    /**
-     * @brief m_fs
-     */
-    FunctionSignature m_fs;
-    /**
-     * @brief m_file source name
-     */
-    std::string m_file;
-    /**
-     * @brief m_row m_col m_off
-     * @ m_off -> offset of whole file
-     */
-    unsigned int m_row;
-    unsigned int m_col;
-    unsigned int m_off;
+struct Function : public Signature {
+    string orignal;
+
+    unsigned int row;
+    unsigned int col;
+    unsigned int off;
+
+    Function()
+        :Signature()
+        ,orignal()
+        ,row(0)
+        ,col(0)
+        ,off(0)
+    {}
+
+    Function(const ReturnType& return_type, const ArgList& arg_list, const FuncName& func_name)
+         :Signature(return_type, arg_list, func_name)
+         ,orignal()
+         ,row(0)
+         ,col(0)
+         ,off(0)
+     {}
 };
 
 NAMESPACE_FF_END
