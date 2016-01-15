@@ -1,7 +1,6 @@
 #ifndef FFCONFIG_H
 #define FFCONFIG_H
 
-#include <ccconfig.h>
 
 #define FF_VERSION   "0.0.1"
 
