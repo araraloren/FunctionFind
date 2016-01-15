@@ -49,10 +49,10 @@ getLocalTimeStr(const string& format);
  * 判断文件的状态
 */
 #if (defined CC_PF_LINUX) || (defined CC_PF_MINGW32)
-    //#define	R_OK	4		/* Test for read permission.  */
-    //#define	W_OK	2		/* Test for write permission.  */
-    //#define	X_OK	1		/* Test for execute permission.  */
-    //#define	F_OK	0		/* Test for existence.  */
+	//#define	R_OK	4		/* Test for read permission.  */
+	//#define	W_OK	2		/* Test for write permission.  */
+	//#define	X_OK	1		/* Test for execute permission.  */
+	//#define	F_OK	0		/* Test for existence.  */
 #else
 #	define	R_OK	4		/* Test for read permission.  */
 #	define	W_OK	2		/* Test for write permission.  */
@@ -62,6 +62,9 @@ getLocalTimeStr(const string& format);
 
 bool
 accessFile(const string& file, int mode = F_OK);
+
+bool
+accessFile(const char* file, int mode = F_OK);
 
 /*
  * 递归的创建目录
@@ -73,23 +76,23 @@ createDirectory(const string& directory);
 /*
  * 分割字符串
 */
-
+// cc::trim
 typedef std::string format_func(const std::string &);
 
 std::vector<std::string>
-spiltString(const std::string& str, int capacity = 1);//split string with whitespace
+splitString(const std::string& str, int capacity = 1);//split string with whitespace
 
 std::vector<std::string>
-spiltString(const std::string& str, format_func *pf, int capacity = 1);//split string with whitespace
+splitString(const std::string& str, format_func *pf, int capacity = 1);//split string with whitespace
 
 //std::vector<std::string>
-//spiltString(const std::string& str, const char sep, int capacity = 1);//sep = '|','@', etc
+//splitString(const std::string& str, const char sep, int capacity = 1);//sep = '|','@', etc
 
 //std::vector<std::string>
-//spiltString(const std::string &str, const char sep[], int capacity = 1);//sep = {"^^"}, {"||"}, etc
+//splitString(const std::string &str, const char sep[], int capacity = 1);//sep = {"^^"}, {"||"}, etc
 
 //std::vector<std::string>
-//spiltString(const std::string &str, const std::string& sep, int capacity = 1);
+//splitString(const std::string &str, const std::string& sep, int capacity = 1);
 
 template <typename X>
 struct splitstring_helper {
@@ -104,10 +107,10 @@ struct splitstring_helper<char> {
 #if __cplusplus >= 201103L
 
 std::vector<std::string>
-spiltString(const std::string &str, const std::string& regex, int capacity = 1);
+splitString(const std::string &str, const std::string& regex, int capacity = 1);
 
 std::vector<std::string>
-spiltString(const std::string &str, const std::string& regex, format_func *pf, int capacity = 1);
+splitString(const std::string &str, const std::string& regex, format_func *pf, int capacity = 1);
 
 #else
 
@@ -132,17 +135,17 @@ template <bool>
 struct splitstring_ {
     template <typename X>
     static std::vector<std::string>
-    spiltString(const std::string &str, const X& sep, int capacity);
+    splitString(const std::string &str, const X& sep, int capacity);
     template <typename X>
     static std::vector<std::string>
-    spiltString(const std::string &str, const X& sep, format_func *pf, int capacity);
+    splitString(const std::string &str, const X& sep, format_func *pf, int capacity);
 };
 
 template <>
 struct splitstring_<true> {
     template <typename X>
     static std::vector<std::string>
-    spiltString(const std::string &str, const X& sep, int capacity)
+    splitString(const std::string &str, const X& sep, int capacity)
     {
         std::vector<std::string> ret;
         std::string::size_type cut = 0;
@@ -167,7 +170,7 @@ struct splitstring_<true> {
 
     template <typename X>
     static std::vector<std::string>
-    spiltString(const std::string &str, const X& sep, format_func *pf, int capacity)
+    splitString(const std::string &str, const X& sep, format_func *pf, int capacity)
     {
         std::vector<std::string> ret;
         std::string::size_type cut = 0;
@@ -193,18 +196,18 @@ struct splitstring_<true> {
 
 template <typename T>
 std::vector<std::string>
-spiltString(const std::string &str, const T& sep, int capacity = 1)
+splitString(const std::string &str, const T& sep, int capacity = 1)
 {
-    return splitstring_<splitstring_helper<T>::value>::spiltString(str,
+    return splitstring_<splitstring_helper<T>::value>::splitString(str,
                                                                    sep,
                                                                    capacity);
 }
 
 template <typename T>
 std::vector<std::string>
-spiltString(const std::string &str, const T& sep, format_func *pf, int capacity = 1)
+splitString(const std::string &str, const T& sep, format_func *pf, int capacity = 1)
 {
-    return splitstring_<splitstring_helper<T>::value>::spiltString(str,
+    return splitstring_<splitstring_helper<T>::value>::splitString(str,
                                                                    sep,
                                                                    pf,
                                                                    capacity);
@@ -224,15 +227,15 @@ template<typename T, typename... Args>      // note the "..."
 void
 printf(std::ostream& out, const char* s, T& value, Args... args)   // note the "..."
 {
-    while (*s) {
-        if (*s=='%' && *++s!='%') { // a format specifier (ignore which one it is)
-            out << value;     // use first non-format argument
+	while (*s) {
+		if (*s=='%' && *++s!='%') { // a format specifier (ignore which one it is)
+			out << value;     // use first non-format argument
             return printf(out, *s ? ++s : s, args ...);    // "peel off" first argument
-        }
-        out << *s++;
-    }
+		}
+		out << *s++;
+	}
 
-    throw std::runtime_error("extra arguments provided to printf");
+	throw std::runtime_error("extra arguments provided to printf");
 }
 
 /*
@@ -242,7 +245,7 @@ template <typename T>
 void
 print(std::ostream& out, T& s)
 {
-    out <<s;
+	out <<s;
 }
 
 template<typename T, typename... Args>
@@ -250,7 +253,7 @@ void
 print(std::ostream& out, T& value, Args... args)
 {
     out <<value;
-    print(out, args ...);
+	print(out, args ...);
 }
 /*
  * 递归的将args里面的数据输出到out里面
@@ -285,6 +288,12 @@ getExtname(const char* filename, size_t len);
 std::string
 getExtname(const std::string& filename);
 
+bool
+isDirectory(const char* path);
+
+bool
+isDirectory(const std::string& path);
+
 /*
  * search directory
 */
@@ -303,6 +312,9 @@ searchDirectory(const std::string& directory, bool recursive, const char* extnam
 
 std::vector<std::string>
 searchDirectory(const char* directory, bool recursive, const char* extname);
+
+std::vector<std::string>
+searchDirectory(const std::string& directory, bool recursive, const std::vector<std::string>& exts);
 
 ccNamespaceEnd(cc)
 
