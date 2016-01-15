@@ -3,7 +3,7 @@
 #include <ccsseqqueue.h>
 #include <cctest.h>
 #include <functional>
-#include <getoption.h>
+#include <ffoption.h>
 
 using namespace std;
 

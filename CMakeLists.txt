@@ -29,12 +29,12 @@ set(SRC_LIST
     ./include/ffconfig.h
     ./include/ffraii.h
     ./include/fffuncparser.h
-    ./include/getoption.h
+    ./include/ffoption.h
     ./include/ffparser.h
 
     ./src/main.cpp
     ./src/fffuncparser.cpp
-    ./src/getoption.cpp
+    ./src/ffoption.cpp
     ./src/ffparser.cpp
 
     ./threadpool/syncsemaphore.h
