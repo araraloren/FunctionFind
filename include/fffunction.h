@@ -13,11 +13,15 @@ NAMESPACE_FF_BEGIN
 
 enum Type {
     T_None,
-    T_Any,
     T_Void,
+    T_Type, // for type
     T_Template,
-    T_Type,
+    T_Count, // for args
+    T_List, // for args
+    T_Name, // for function name
+    T_Any, // any
     T_Normal,
+    T_Error,
 };
 
 struct VarType {
@@ -31,35 +35,78 @@ struct VarType {
         ,name()
     {}
 
-    VarType(Type type, const string& type_name, const string& var_name)
+    VarType(Type type)
         :type(type)
+        ,type_name()
+        ,name()
+    {}
+
+
+    VarType(const string& type_name, const string& var_name)
+        :type(T_Type)
         ,type_name(type_name)
         ,name(var_name)
     {}
 
-    VarType(Type type, const std::string &type_name)
-        :type(type)
+    VarType(const std::string &type_name)
+        :type(T_Type)
         ,type_name(type_name)
         ,name()
     {}
 };
 
-typedef VarType ReturnType;
 typedef VarType ArgumentType;
+
+struct ReturnType {
+    Type    type; // var type
+    string  name; // type name
+
+    VarType()
+        :type(T_None)
+        ,name()
+    {}
+
+    VarType(Type type)
+        :type(type)
+        ,name()
+    {}
+
+    VarType(const std::string &type_name)
+        :type(T_Type)
+        ,name(type_name)
+    {}
+};
 
 struct ArgList {
     Type    type;
-    vector<ArgumentType> list;
+    union {
+        vector<ArgumentType> args;
+        size_t count;
+    }list;
 
     ArgList()
         :type(T_None)
         ,list()
     {}
 
-    ArgList(Type type, const vector<ArgumentType>& arglist)
+    ArgList(Type type)
         :type(type)
-        ,list(arglist)
+        ,list()
     {}
+
+    ArgList(const vector<ArgumentType>& arglist)
+        :type(T_List)
+        ,list()
+    {
+        list.args = arglist;
+    }
+
+    ArgList(size_t count)
+        :type(T_Count)
+        ,list()
+    {
+        list.count = count;
+    }
 };
 
 struct FuncName {
@@ -71,8 +118,13 @@ struct FuncName {
         ,name()
     {}
 
-    FuncName(Type type, const string& name)
+    FuncName(Type type)
         :type(type)
+        ,name()
+    {}
+
+    FuncName(const string& name)
+        :type(T_Name)
         ,name(name)
     {}
 };
