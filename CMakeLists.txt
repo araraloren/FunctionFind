@@ -1,8 +1,8 @@
 project(FunctionFind)
 cmake_minimum_required(VERSION 2.8)
-set(CMAKE_CXX_FLAGS "-std=c++11 -Wall -Wextra -Werror")
-set(CMAKE_CXX_FLAGS_DEBUG "-std=c++11 -g -Wall -Wextra -Werror")
-set(CMAKE_CXX_FLAGS_RELEASE "-std=c++11 -Os -Wall -Wextra -Werror")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -Wall -Wextra -Werror")
+set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -std=c++11 -g -Wall -Wextra -Werror")
+set(CMAKE_CXX_FLAGS_RELEASE " ${CMAKE_CXX_FLAGS_RELEASE} -std=c++11 -Os -Wall -Wextra -Werror")
 set(SRC_LIST
     ./cc/ccpublic.h
     ./cc/ccatomic.h
@@ -26,14 +26,16 @@ set(SRC_LIST
 
     ./include/fffunction.h
     ./include/ffpublic.h
-    ./include/ffoption.h
     ./include/ffconfig.h
     ./include/ffraii.h
     ./include/fffuncparser.h
+    ./include/getoption.h
+    ./include/ffparser.h
 
     ./src/main.cpp
     ./src/fffuncparser.cpp
-    ./src/ffoption.cpp
+    ./src/getoption.cpp
+    ./src/ffparser.cpp
 
     ./threadpool/syncsemaphore.h
     ./threadpool/threadpool.cpp
