@@ -9,46 +9,45 @@ type switch:
 	-d => declare
 
 files:
-	./ => directory,
+	./ -e cpp,h => directory, extension name filter
 	./something.[cpp, cxx, c++] => cpp file,
 	./something.[h, hpp] => cpp header,
 	./something.[c] => c file
 	
 switch:
 	-i, --ignore-case => ignore case,
-	-r, --recursion => recursion find directory,
+	-r, --recursive => recursive find directory,
 	-f, --print-filename => print file name,
 	-n, --print-linenum => print line number,
 	-o, --print-offset => print offset of whole file,
 	-c, --print-column => print column number,
 	-h, --help => print help of [ff],
 	-v, --version => print version of [ff],
-	
-	--only-count => only print match count, [will forbidden -n -o -c, but you can use -f]
+	-t, --only-count => only print match count, [will forbidden -n -o -c, but you can use -f]
 	
 option:
-	--start-time => start time limit of file
+	-S, --start-time => start time limit of file
 	[
 		1449582574 -> long integer time
 		2015:12:08 21:50:24 -> string format
 	],
-	--end-time => end time of file
+	-E, --end-time => end time of file
 	[
 		same as --start-time
 	],
-	-j, --thread => use multi thread
+	-J, --thread => use multi thread
 	[
 		4 -> a integer number
 	],
-	--clang-args => set clang's arg parse c/c++ source file
+	-A, --clang-args => set clang's arg parse c/c++ source file
 	[
 		default clang's parse arg are 'c++ -x -std=c++11' 
 	],
-	--class => specify class name
+	-C, --class => specify class name
 	[
 		class name
 	],
-	--struct => specify struct name
+	-T, --struct => specify struct name
 	[
 		struct name
 	]
