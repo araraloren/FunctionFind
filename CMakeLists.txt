@@ -1,21 +1,48 @@
 project(FunctionFind)
 cmake_minimum_required(VERSION 2.8)
-set(CMAKE_CXX_FLAGS "-std=c++11 -Wall -Wextra -Werror")
-set(CMAKE_CXX_FLAGS_DEBUG "-std=c++11 -g -Wall -Wextra -Werror")
-set(CMAKE_CXX_FLAGS_RELEASE "-std=c++11 -Os -Wall -Wextra -Werror")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -Wall -Wextra -Werror")
+set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -std=c++11 -g -Wall -Wextra -Werror")
+set(CMAKE_CXX_FLAGS_RELEASE " ${CMAKE_CXX_FLAGS_RELEASE} -std=c++11 -Os -Wall -Wextra -Werror")
 set(SRC_LIST
+    ./cc/ccpublic.h
+    ./cc/ccatomic.h
+    ./cc/cctypedef.h
+    ./cc/cctest.h
+    ./cc/ccthread.h
+    ./cc/ccpublic.cpp
+    ./cc/ccconfig.h
+    ./cc/ccsseqqueue.h
+    ./cc/cctest.cpp
+    ./cc/ccseqqueue.h
+
+    ./cpplogger/cllogger.h
+    ./cpplogger/cltypedef.h
     ./cpplogger/cllogger.cpp
     ./cpplogger/clinforegistry.cpp
+    ./cpplogger/clconfig.h
+    ./cpplogger/clinforegistry.h
+    ./cpplogger/clinfo.h
     ./cpplogger/clinfo.cpp
-    ./cc/ccpublic.cpp
-    ./cc/cctest.cpp
+
+    ./include/fffunction.h
+    ./include/ffpublic.h
+    ./include/ffconfig.h
+    ./include/ffraii.h
+    ./include/fffuncparser.h
+    ./include/ffoption.h
+    ./include/ffparser.h
+
     ./src/main.cpp
-    ./src/ffoption.cpp
     ./src/fffuncparser.cpp
+    ./src/ffoption.cpp
+    ./src/ffparser.cpp
+
+    ./threadpool/syncsemaphore.h
     ./threadpool/threadpool.cpp
+    ./threadpool/threadpool.h
     ./threadpool/syncsemaphore.cpp
-    ./threadpool/thread.hpp
     ./threadpool/itask.h
+    ./threadpool/thread.hpp
 )
 exec_program(llvm-config . ARGS "--libdir" OUTPUT_VARIABLE LLVMLD)
 exec_program(llvm-config . ARGS "--includedir" OUTPUT_VARIABLE LLVMIN)

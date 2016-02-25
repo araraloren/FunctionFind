@@ -230,6 +230,10 @@ protected:
 
 	cc::SeqQueue<ClMessage>   m_msg_queue;
     ClInfoRegistry          m_infos_reg;
+
+private:
+    ClLogger(const ClLogger&);
+    ClLogger& operator = (const ClLogger&);
 };
 
 //cpplogger namespace

@@ -1,285 +1,233 @@
-#ifndef FFOPTION_H
-#define FFOPTION_H
+#ifndef GETOPTION_H
+#define GETOPTION_H
 
-#include <string>
 #include <ctime>
+#include <vector>
+#include <string>
 #include <cstring>
 #include <ffconfig.h>
-#include <fffunction.h>
 #include <ccpublic.h>
+#include <fffunction.h>
+#include <ffparser.h>
+
+using std::vector;
+using std::string;
+using std::time_t;
 
 NAMESPACE_FF_BEGIN
 
-const size_t FF_ARGV_MAX = 128;
+const size_t FF_ARGS_MAX = 128;
 
-class FFOption
+class CommandOption
 {
 public:
-    static FFOption*
-    getInstance()
+    static CommandOption* getInstance()
     {
-        //in c++11 it's threadsafe
-        static FFOption _instance;
+        static CommandOption s_instance;
 
-        return &_instance;
+        return &s_instance;
     }
 
     bool
-    parseCommandArgs(int argc, char** argv);
+    parseArgv(int argc, char ** argv);
 
     void
-    printOptionHelp() const;
+    help(const char* name, int err_msg_code);
 
-private:
-    FFOption();
-    FFOption(const FFOption& );
-    FFOption operator = (const FFOption&);
-    ~FFOption()
-    {
-        for (size_t i = 0;i < clang_args_cnt_;i ++) {
-            delete clang_args_[i];
-        }
-    }
-
-    /*setOptions*/
-public:
-
-    inline void
-    setIgnoreName(bool is_ignore_name)
-    {
-        this->ignore_name_ = is_ignore_name;
-    }
-
-    inline void
-    setIgnoreRetType(bool is_ignore_ret_type)
-    {
-        this->ignore_ret_type_ = is_ignore_ret_type;
-    }
-
-    inline void
-    setUseRegex(bool is_use_regex)
-    {
-        this->regex_ = is_use_regex;
-    }
-
-    inline void
-    setRecursion(bool is_recursion_)
-    {
-        this->recursion_ = is_recursion_;
-    }
-
-    inline void
-    setMatchDeclare(bool is_match_declare)
-    {
-        this->find_declare_ = is_match_declare;
-    }
-
-    inline void
-    setPrintFilename(bool is_print_filename)
-    {
-        this->print_filename_ = is_print_filename;
-    }
-
-    inline void
-    setPrintLineNumber(bool is_print_line_number)
-    {
-        this->print_line_num_ = is_print_line_number;
-    }
-
-    inline void
-    setPrintMatchCount(bool is_print_match_count)
-    {
-        this->print_match_count_ = is_print_match_count;
-    }
-
-    inline void
-    setStartTime(std::time_t start_time)
-    {
-        this->start_time_ = start_time;
-    }
-
-    inline void
-    setEndTime(std::time_t end_time)
-    {
-        this->end_time_ = end_time;
-    }
-
-    inline void
-    setThreadCount(std::size_t thread_count)
-    {
-        this->threads_ = thread_count;
-    }
-
-    inline void
-    setFunctionSignature(const FunctionSignature& fs)
-    {
-        this->function_signature_ = fs;
-    }
-
-    inline void
-    setClangArgs(const std::string& args)
-    {
-        this->checkClangOptions(args);
-    }
-
-    inline void
-    setFiles(const std::vector<std::string>& files)
-    {
-        this->files_ = files;
-    }
-
-    inline void
-    pushFiles(const std::string& file)
-    {
-        this->files_.push_back(file);
-    }
-
-    /*getOptions*/
-public:
-
-    inline bool
-    isIgnoreName() const
-    {
-        return this->ignore_name_;
-    }
-
-    inline bool
-    isIgnoreRetType() const
-    {
-        return this->ignore_ret_type_;
-    }
-
-    inline bool
-    isUseRegex() const
-    {
-        return this->regex_;
-    }
-
-    inline bool
-    isRecursion() const
-    {
-        return this->recursion_;
-    }
-
-    inline bool
-    isMatchDeclare() const
-    {
-        return this->find_declare_;
-    }
-
-    inline bool
-    isPrintFilename() const
-    {
-        return this->print_filename_;
-    }
-
-    inline bool
-    isPrintLineNumber() const
-    {
-        return this->print_line_num_;
-    }
-
-    inline bool
-    isPrintMatchCount() const
-    {
-        return this->print_match_count_;
-    }
-
-    inline std::time_t
-    startTime() const
-    {
-        return this->start_time_;
-    }
-
-    inline std::time_t
-    endTime() const
-    {
-        return this->end_time_;
-    }
-
-    inline std::size_t
-    threadCount() const
-    {
-        return this->threads_;
-    }
-
-    inline const FunctionSignature&
-    functionSignature() const
-    {
-        return this->function_signature_;
-    }
-
-    inline char* const *
-    clangArgs() const
-    {
-        return this->clang_args_;
-    }
-
-    inline const std::vector<std::string>
-    files() const
-    {
-        return this->files_;
-    }
-
-public:
-//#ifdef FF_DEBUG
     void
-    debugPrintStatus() const;
-//#endif
-public:
-    void
-    checkClangOptions(const std::string& str)
-    {
-        if (clang_args_cnt_ > 0) {
-            return ;
-        }
-        std::vector<std::string> arglist = cc::spiltString(str, ',', cc::trim);
+    debugOption();
 
-        clang_args_cnt_ = arglist.size();
-        for (size_t i = 0;i < arglist.size();i ++) {
-            std::string &arg = arglist[i];
-
-            clang_args_[i] = new char[arg.size() + 1];
-            std::memcpy(clang_args_[i], arg.c_str(), arg.size());
-            *clang_args_[arg.size()] = '\0';
-        }
-    }
-
-    /*switch*/
 private:
-    bool    ignore_name_;
+    /* constructor */
+    CommandOption();
 
-    bool    ignore_ret_type_;
+    /* copy constructor */
+    CommandOption(const CommandOption& );
 
-    bool    regex_;
+    /* assignment operator */
+    CommandOption operator = (const CommandOption&);
 
-    bool    recursion_;
+    /* destructor */
+    ~CommandOption();
 
-    bool    find_declare_;
-
-    bool    print_filename_;
-
-    bool    print_line_num_;
-
-    bool    print_match_count_;
-
-    /*options*/
+    /* main switch && data */
 private:
-    std::time_t   start_time_;
+    enum TypeSwitch {
+        TSFUNC = 0x0001,
+        TSDECL = 0x0002,
+    };
 
-    std::time_t   end_time_;
+    /**
+     * @brief m_ts
+     */
+    TypeSwitch m_ts;
 
-    int    threads_;
+    /*
+     * CFILE
+    */
+    struct CFILE {
+        std::string path;
+        std::int32_t eflag;
+        CFILE() :path(), eflag(0) {}
+        CFILE(const char* path, std::int32_t eflag): path(path), eflag(eflag) {}
+        CFILE(const std::string path, std::int32_t eflag): path(path), eflag(eflag) {}
+    };
 
-    FunctionSignature   function_signature_;
+    struct CDIR : public CFILE {
+        std::vector<std::string> exts;
+    };
 
-    size_t clang_args_cnt_;
+    /**
+     * @brief m_files
+     * - files will be parse
+     */
+    vector<CFILE> m_files;
 
-    char* clang_args_[FF_ARGV_MAX];
+    /**
+     * @brief m_signatures
+    */
+    vector<Signature> m_signatures;
 
-    std::vector<std::string> files_;
+    /* switch */
+private:
+    /**
+     * @brief m_ignore_case
+     * - ignore case of function name
+     * - ignore case of arg name
+     * - default is false
+     */
+    bool m_ignore_case;
+
+    /**
+     * @brief m_recursion
+     * - recursion search file in directory
+     * - default is false
+     */
+    bool m_recursive;
+
+    /**
+     * @brief m_print_line
+     * - print match line
+     * - default is true
+     * - will disable by --only-count
+     */
+    //bool m_print_line;
+
+    /**
+     * @brief m_print_ln
+     * - print file name
+     * - default is true
+     * - will disable by --only-count, but you can specify it as true
+     */
+    bool m_print_fn;
+
+    /**
+     * @brief m_print_ln
+     * - print line number
+     * - default is false
+     * - will forbidden by --only-count
+     */
+    bool m_print_ln;
+
+    /**
+     * @brief m_print_off
+     * - print offset of whole file
+     * - default is false
+     * - will forbidden by --only-count
+     */
+    bool m_print_off;
+
+    /**
+     * @brief m_print_col
+     * - print column number
+     * - default is false
+     * - will forbidden by --only-count
+     */
+    bool m_print_col;
+
+    /**
+     * @brief m_print_oc
+     * - print only count
+     * - default is false
+     */
+    bool m_print_oc;
+
+    /* option */
+private:
+    /**
+     * @brief m_start_tm
+     */
+    time_t m_start_tm;
+
+    /**
+     * @brief m_end_tm
+     */
+    time_t m_end_tm;
+
+    /**
+     * @brief m_job_t
+     */
+    int m_job_t;
+
+    /**
+     * @brief m_args_cnt
+     */
+    int m_args_cnt;
+
+    /**
+     * @brief m_args
+     */
+    char* m_args[FF_ARGS_MAX];
+
+    /**
+     * @brief m_class_name
+     * - specified struct or class name
+     */
+    string m_class_name;
+
+    /**
+     * @brief m_struct_name
+     * - specified struct or class name
+     */
+    string m_struct_name;
+
+    /* option helper */
+private:
+    enum FileType {
+        FT_OTHER=-1,
+        FT_C    = 0x00000001,
+        FT_CPP  = 0x00000002,
+        FT_C__  = 0x00000004, //c++
+        FT_CXX  = 0x00000008,
+        FT_H    = 0x00000016,
+        FT_HPP  = 0x00000032,
+        FT_FILE = 0x00000064,
+        FT_DIR  = 0x00000128,
+        FT_NOEXT= 0x00000256,
+    };
+
+    FileType
+    getFileType(const char* path);
+
+    FileType
+    getExtType(const char* pext);
+
+    bool
+    isBeginWithMinus(const char* str);
+
+    bool
+    isExtFlag(const char* str);
+
+    bool
+    genTypeSwitch(const char* str);
+
+    bool
+    genFiles(const char* str);
+
+    time_t
+    toTimet(const char* str);
 };
 
 NAMESPACE_FF_END
 
-#endif // FFOPTION_H
+#endif // GETOPTION_H

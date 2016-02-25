@@ -77,16 +77,16 @@ public:
 	void
 	push(const T& ref)
     {
-		static uint8_t S_CAN_PUT = FV_CAN_PUT;
+        uint8_t U_CAN_PUT = FV_CAN_PUT;
 
         //获取当前的下一个pos
-        PT curr_pos = m_front.inc() % m_length;
+        register PT curr_pos = m_front.inc() % m_length;
 
         //判断元素是否可以赋值	
-		while(! ((m_flags + curr_pos)->cas(&S_CAN_PUT, FV_PUT_NOW))) {
+        while(! ((m_flags + curr_pos)->cas(&U_CAN_PUT, FV_PUT_NOW))) {
 			cc::microSleep(m_cas_wait);
 #if __cplusplus >= 201103L
-			S_CAN_PUT = FV_CAN_PUT;
+            U_CAN_PUT = FV_CAN_PUT;
 #endif
 		}
 
@@ -98,14 +98,14 @@ public:
 	void
 	pop(T& ref)
     {
-		static uint8_t S_CAN_GET = FV_CAN_GET;
+        uint8_t U_CAN_GET = FV_CAN_GET;
 
-        PT curr_pos = m_back.inc() % m_length;
+        register PT curr_pos = m_back.inc() % m_length;
 
-		while(! ((m_flags + curr_pos)->cas(&S_CAN_GET, FV_GET_NOW))) {
+        while(! ((m_flags + curr_pos)->cas(&U_CAN_GET, FV_GET_NOW))) {
 			cc::microSleep(m_cas_wait);
 #if __cplusplus >= 201103L
-			S_CAN_GET = FV_CAN_GET;
+            U_CAN_GET = FV_CAN_GET;
 #endif
 		}
 

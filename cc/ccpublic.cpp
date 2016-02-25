@@ -6,6 +6,8 @@
 #endif
 #ifdef CC_PF_LINUX
 #   include <errno.h>
+#   include <dirent.h>
+#   include <sys/stat.h>
 #endif
 
 #include <cctype>
@@ -171,6 +173,27 @@ cc::accessFile(const std::string &file, int mode)
 	return ret;
 }
 
+bool
+cc::accessFile(const char *file, int mode)
+{
+    bool ret = true;
+
+#ifdef CC_PF_LINUX
+    if(access(file, mode) != 0){
+        return false;
+    }
+#elif (defined CC_PF_MINGW32)
+    if(access(file, mode) != 0){
+        return false;
+    }
+#elif (defined CC_PF_WIN32)
+    if (_access(file, mode) != 0){
+        return false;
+    }
+#endif
+
+    return ret;
+}
 
 bool
 cc::createDirectory(const std::string &directory)
@@ -234,8 +257,44 @@ cc::printf(std::ostream& out, const char* s)
 
 #endif
 
+std::string
+cc::repeat(char ch, size_t count)
+{
+    string ret;
+
+    for (size_t i = 1;i < count;i ++) {
+        ret.push_back(ch);
+    }
+
+    return ret;
+}
+
+std::string
+cc::repeat(const char* str, size_t count)
+{
+    string ret;
+
+    for (size_t i = 1;i < count;i ++) {
+        ret += str;
+    }
+
+    return ret;
+}
+
+std::string
+cc::repeat(const string& str, size_t count)
+{
+    string ret;
+
+    for (size_t i = 1;i < count;i ++) {
+        ret += str;
+    }
+
+    return ret;
+}
+
 std::vector<std::string>
-cc::spiltString(const std::string &str, int capacity)
+cc::splitString(const std::string &str, int capacity)
 {
     std::vector<std::string> ret;
     std::string::const_iterator beg = str.begin();
@@ -259,7 +318,7 @@ cc::spiltString(const std::string &str, int capacity)
 }
 
 std::vector<std::string>
-cc::spiltString(const std::string &str, cc::format_func *pf, int capacity)
+cc::splitString(const std::string &str, cc::format_func *pf, int capacity)
 {
     std::vector<std::string> ret;
     std::string::const_iterator beg = str.begin();
@@ -282,11 +341,9 @@ cc::spiltString(const std::string &str, cc::format_func *pf, int capacity)
     return ret;
 }
 
-#include <iostream>
-
 #if __cplusplus >= 201103L
 std::vector<std::string>
-cc::spiltString(const std::string &str, const std::string &sep, int capacity)
+cc::splitString(const std::string &str, const std::string &sep, int capacity)
 {
     std::vector<std::string> ret;
     std::regex  pattern(sep);
@@ -301,7 +358,7 @@ cc::spiltString(const std::string &str, const std::string &sep, int capacity)
 }
 
 std::vector<std::string>
-cc::spiltString(const std::string &str, const std::string &sep, cc::format_func *pf,int capacity)
+cc::splitString(const std::string &str, const std::string &sep, cc::format_func *pf,int capacity)
 {
     std::vector<std::string> ret;
     std::regex  pattern(sep);
@@ -318,7 +375,7 @@ cc::spiltString(const std::string &str, const std::string &sep, cc::format_func 
 
 std::string
 cc::trim(const std::string &str)
-{
+{//may be implement by a static whitespace table
     std::string::size_type beg = 0;
     std::string::size_type end = str.length() - 1;
 
@@ -341,3 +398,357 @@ cc::trim(const std::string &str)
     return str.substr(beg, end - beg + 1);
 }
 
+
+const char *
+cc::getExtname(const char *filename)
+{
+    if (!filename) return nullptr;
+
+    const char* pext = nullptr;
+
+    if (!(pext = std::strrchr(filename, '.'))) {
+        return nullptr;
+    }
+    else {
+        return pext++;
+    }
+}
+
+const char *
+cc::getExtname(const char *filename, size_t len)
+{
+    if (!filename || !len) return nullptr;
+
+    const char* pext = nullptr;
+
+    for (;len > 0;len --) {
+        if (*(pext + len - 1) == '.') {
+            return pext + len - 1;
+        }
+    }
+
+    return nullptr;
+}
+
+std::string
+cc::getExtname(const std::string &filename)
+{
+    std::string::size_type pos = 0;
+
+    pos = filename.rfind('.');
+    if (pos == std::string::npos) {
+        return std::string();
+    }
+    else {
+        return filename.substr(pos + 1);
+    }
+}
+
+bool
+cc::isDirectory(const char *path)
+{
+    struct stat fstat;
+
+    if (-1 != lstat(path, &fstat)) {
+        return S_ISDIR(fstat.st_mode);
+    }
+
+    return false;
+}
+
+bool
+cc::isDirectory(const std::string& path)
+{
+    struct stat fstat;
+
+    if (-1 != lstat(path.c_str(), &fstat)) {
+        return S_ISDIR(fstat.st_mode);
+    }
+
+    return false;
+}
+
+// ############################# for search directory
+namespace {
+
+const static size_t SEARCH_PATH_LENGTH = 1024;
+
+using std::strcmp;
+
+    // extname -> "ext" or ""(no extname) or { "x", "y", 0 }
+    void
+    searchDirectoryMultiExtname(const char* directory, std::vector<std::string>& files, bool subdir, const std::vector<std::string>& exts, bool no_extname)
+    {
+        DIR* pdir = nullptr;
+
+        if ((pdir = opendir(directory)) == nullptr) {
+            return;
+        }
+
+        struct dirent entry;
+        struct dirent *res;
+
+        struct stat fstat;
+
+        const char* name;
+
+        char curpath[SEARCH_PATH_LENGTH];
+
+        while (readdir_r(pdir, &entry, &res) == 0 && res) {
+            name = entry.d_name;
+
+            if (strcmp(name, ".") == 0 || strcmp(name, "..") == 0) {
+                continue;
+            }
+
+            int count = std::snprintf(curpath, SEARCH_PATH_LENGTH, "%s", directory);
+
+            count += std::snprintf(&curpath[count], SEARCH_PATH_LENGTH - count, "%s%s", \
+                                   curpath[count - 1] == '/' ? "" : "/", name);
+
+            if (lstat(curpath, &fstat) != -1) {
+                if (!S_ISDIR(fstat.st_mode)) {
+                    const char *e = std::strrchr(curpath, '.');
+
+                    if (e != nullptr) {
+                        for (std::vector<std::string>::const_iterator ci = exts.begin();
+                             ci != exts.end(); ci ++) {
+                            if (strcmp(e, ci->c_str()) == 0) {
+                                files.push_back(std::string(curpath, count));
+                                break;
+                            }
+                        }
+                    } else if ((e == nullptr && no_extname)) {
+                        files.push_back(std::string(curpath, count));
+                    }
+                } else if (subdir) {
+                    searchDirectoryMultiExtname(curpath, files, subdir, exts, no_extname);
+                }
+            }
+        }
+
+        closedir(pdir);
+    }
+
+    void
+    searchDirectoryExtname(const char* directory, std::vector<std::string>& files, bool subdir, const char*  extname)
+    {
+        DIR* pdir = nullptr;
+
+        if ((pdir = opendir(directory)) == nullptr) {
+            return;
+        }
+
+        struct dirent entry;
+        struct dirent *res;
+
+        struct stat fstat;
+
+        const char* name;
+
+        char curpath[SEARCH_PATH_LENGTH];
+
+        while (readdir_r(pdir, &entry, &res) == 0 && res) {
+            name = entry.d_name;
+
+            if (strcmp(name, ".") == 0 || strcmp(name, "..") == 0) {
+                continue;
+            }
+
+            int count = std::snprintf(curpath, SEARCH_PATH_LENGTH, "%s", directory);
+
+            count += std::snprintf(&curpath[count], SEARCH_PATH_LENGTH - count, "%s%s", \
+                                   curpath[count - 1] == '/' ? "" : "/", name);
+
+            if (lstat(curpath, &fstat) != -1) {
+                if (!S_ISDIR(fstat.st_mode)) {
+                    const char *e = std::strrchr(curpath, '.');
+
+                    if (e != nullptr && strcmp(e + 1, extname) == 0) {
+                        files.push_back(std::string(curpath, count));
+                    }
+                } else if (subdir) {
+                    searchDirectoryExtname(curpath, files, subdir, extname);
+                }
+            }
+        }
+
+        closedir(pdir);
+    }
+
+    void
+    searchDirectoryNoExtname(const char* directory, std::vector<std::string>& files, bool subdir)
+    {
+        DIR* pdir = nullptr;
+
+        if ((pdir = opendir(directory)) == nullptr) {
+            return;
+        }
+
+        struct dirent entry;
+        struct dirent *res;
+
+        struct stat fstat;
+
+        const char* name;
+
+        char curpath[SEARCH_PATH_LENGTH];
+
+        while (readdir_r(pdir, &entry, &res) == 0 && res) {
+            name = entry.d_name;
+
+            if (strcmp(name, ".") == 0 || strcmp(name, "..") == 0) {
+                continue;
+            }
+
+            int count = std::snprintf(curpath, SEARCH_PATH_LENGTH, "%s", directory);
+
+            count += std::snprintf(&curpath[count], SEARCH_PATH_LENGTH - count, "%s%s", \
+                                   curpath[count - 1] == '/' ? "" : "/", name);
+
+            if (lstat(curpath, &fstat) != -1) {
+                if (!S_ISDIR(fstat.st_mode)) {
+                    const char *e = std::strrchr(curpath, '.');
+
+                    if (e == nullptr) {
+                        files.push_back(std::string(curpath, count));
+                    }
+                } else if (subdir) {
+                    searchDirectoryNoExtname(curpath, files, subdir);
+                }
+            }
+        }
+
+        closedir(pdir);
+    }
+
+    void
+    searchDirectoryAllExtname(const char* directory, std::vector<std::string>& files, bool subdir)
+    {
+        DIR* pdir = nullptr;
+
+        if ((pdir = opendir(directory)) == nullptr) {
+            return;
+        }
+
+        struct dirent entry;
+        struct dirent *res;
+
+        struct stat fstat;
+
+        const char* name;
+
+        char curpath[SEARCH_PATH_LENGTH];
+
+        while (readdir_r(pdir, &entry, &res) == 0 && res) {
+            name = entry.d_name;
+
+            if (strcmp(name, ".") == 0 || strcmp(name, "..") == 0) {
+                continue;
+            }
+
+            int count = std::snprintf(curpath, SEARCH_PATH_LENGTH, "%s", directory);
+
+            count += std::snprintf(&curpath[count], SEARCH_PATH_LENGTH - count, "%s%s", \
+                                   curpath[count - 1] == '/' ? "" : "/", name);
+
+            if (lstat(curpath, &fstat) != -1) {
+                if (!S_ISDIR(fstat.st_mode)) {
+                    files.push_back(std::string(curpath, count));
+                } else if (subdir) {
+                    searchDirectoryAllExtname(curpath, files, subdir);
+                }
+            }
+        }
+
+        closedir(pdir);
+    }
+}
+
+std::vector<std::string>
+cc::searchDirectory(const std::string &directory)
+{
+    std::vector<std::string> files;
+
+    searchDirectoryAllExtname(directory.c_str(), files, false);
+
+    return files;
+}
+
+std::vector<std::string>
+cc::searchDirectory(const std::string &directory, bool recursive)
+{
+    std::vector<std::string> files;
+
+    searchDirectoryAllExtname(directory.c_str(), files, recursive);
+
+    return files;
+}
+
+std::vector<std::string>
+cc::searchDirectory(const std::string &directory, const char *extname)
+{
+    std::vector<std::string> files;
+
+    switch (*extname) {
+    case '\0': searchDirectoryNoExtname(directory.c_str(), files, false); break;
+    case '*' : searchDirectoryAllExtname(directory.c_str(), files, false); break;
+    default  : searchDirectoryExtname(directory.c_str(), files, false, extname); break;
+    }
+
+    return files;
+}
+
+std::vector<std::string>
+cc::searchDirectory(const std::string &directory, bool recursive, const char *extname)
+{
+    std::vector<std::string> files;
+
+    switch (*extname) {
+    case '\0': searchDirectoryNoExtname(directory.c_str(), files, recursive); break;
+    case '*' : searchDirectoryAllExtname(directory.c_str(), files, recursive); break;
+    default  : searchDirectoryExtname(directory.c_str(), files, recursive, extname); break;
+    }
+
+    return files;
+}
+
+std::vector<std::string>
+cc::searchDirectory(const char *directory, bool recursive, const char *extname)
+{
+    std::vector<std::string> files;
+
+    switch (*extname) {
+    case '\0': searchDirectoryNoExtname(directory, files, recursive); break;
+    case '*' : searchDirectoryAllExtname(directory, files, recursive); break;
+    default  : searchDirectoryExtname(directory, files, recursive, extname); break;
+    }
+
+    return files;
+}
+
+std::vector<std::string>
+cc::searchDirectory(const std::string &directory, bool recursive, const std::vector<std::string>& exts)
+{
+    std::vector<std::string> files, _exts;
+
+    bool no_extname =  false;
+
+    for (std::vector<std::string>::const_iterator it = exts.begin();    \
+         it != exts.end();it ++) {
+        if (!it->empty()) {
+            _exts.push_back(*it);
+        }
+        no_extname = true;
+    }
+
+    searchDirectoryMultiExtname(directory.c_str(), files, recursive, _exts, no_extname);
+
+    return files;
+}
+
+std::string
+cc::toString(bool boolean)
+{
+    return string(boolean ? "true" : "false");
+}

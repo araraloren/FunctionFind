@@ -1,0 +1,82 @@
+functionfind, [ff]:
+
+[ff] [type switch] [files] [switch] [option] [function signature]
+
+--files may be from std input 
+
+type switch:
+	-f => function,
+	-d => declare
+
+files:
+	./ -e cpp,h => directory, extension name filter
+	./something.[cpp, cxx, c++] => cpp file,
+	./something.[h, hpp] => cpp header,
+	./something.[c] => c file
+	
+switch:
+	-i, --ignore-case => ignore case,
+	-r, --recursive => recursive find directory,
+	-f, --print-filename => print file name,
+	-n, --print-linenum => print line number,
+	-o, --print-offset => print offset of whole file,
+	-c, --print-column => print column number,
+	-h, --help => print help of [ff],
+	-v, --version => print version of [ff],
+	-t, --only-count => only print match count, [will forbidden -n -o -c, but you can use -f]
+	
+option:
+	-S, --start-time => start time limit of file
+	[
+		1449582574 -> long integer time
+		2015:12:08 21:50:24 -> string format
+	],
+	-E, --end-time => end time of file
+	[
+		same as --start-time
+	],
+	-J, --thread => use multi thread
+	[
+		4 -> a integer number
+	],
+	-A, --clang-args => set clang's arg parse c/c++ source file
+	[
+		default clang's parse arg are 'c++ -x -std=c++11' 
+	],
+	-C, --class => specify class name
+	[
+		class name
+	],
+	-T, --struct => specify struct name
+	[
+		struct name
+	]
+	
+function signature:
+	"return-type name(type name, ...)"  ---> full signature
+		"return-type name(type, ...)",  ---> ignore args name
+			"name(type, ...)",  		---> ignore return type
+			"void name(type, ...)", 	---> specify return type as void
+			"return-type (type, ...)", 	---> ignore function name
+			"return-type name()", 		---> ignore args 
+			"return-type name(void)", 	---> specify args as void
+				"(type, ...)",			---> ignore return type and function name
+				"void (type, ...)",   	---> ignore function name and specify return as void
+				"name()",				---> ignore return type and args 
+				"name(void)", 			---> ignore return type and specify args as void 
+				"return-type ()",		---> ignore function name and args 
+				"return-type (void)",	---> ignore function name and specify args as void
+	"name(type name, ...) -> return-type",
+		"name(type, ...) -> return-type",
+			"name(type, ...)",
+			"name(type, ...) -> void",
+			"(type, ...) -> return-type",
+			"name() -> return-type",
+			"name(void) -> return-type",
+				"(type, ...)",
+				"(type, ...) -> void",
+				"name()",
+				"name(void)",
+				"() -> return-type",
+				"(void) -> return-type", 
+	"return-type name(/4)", ---> args number is 4

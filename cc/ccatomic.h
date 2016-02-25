@@ -131,7 +131,7 @@ ccNamespaceDeclare(cc)
 #if __cplusplus >= 201103L
         std::atomic<AT> data_;
 #else
-        AT  data_;
+        volatile AT  data_;
 #endif
     };
 //}

@@ -25,7 +25,7 @@ public:
     parse(const std::string& file);
 
     Function
-    match(const FunctionSignature& fs);
+    match(const Signature& fs);
 
     void
     registerKind(CXCursorKind kind)
@@ -78,7 +78,18 @@ private:
 template <> Function
 FuncParser::parseCursor<CXCursor_FunctionDecl>(CXCursor cursor)
 {
-    FF_AVOID_WARNING(cursor);
+    Function func;
+
+    int num = clang_Cursor_getNumArguments(cursor);
+
+    CXCursor arg;
+
+    for (int i = 0;i < num;i ++) {
+        arg = clang_Cursor_getArgument(cursor, i);
+
+        // todo
+        FF_AVOID_WARNING(func);
+    }
 
     return Function();
 }
