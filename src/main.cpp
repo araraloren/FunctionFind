@@ -13,6 +13,8 @@ int main(int argc, char** argv)
 
     ffop->parseArgv(argc, argv);
 
+    ffop->debugOption();
+
     cc::SSeqQueue<int> squeue;
 
     squeue.init();

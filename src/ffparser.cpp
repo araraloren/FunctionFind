@@ -73,7 +73,7 @@ ff::Signature ff::SignatureParser::parse2(const std::string &str, std::string::s
 
         sign.return_type = rt.empty() ? ReturnType(ff::T_Any) : ReturnType(rt);
     }
-    {
+    {// function name
         string fn = cc::trim(str.substr(0, lpos));
 
         sign.func_name = fn.empty() ? FuncName(ff::T_Any) : FuncName(fn);
@@ -114,14 +114,14 @@ ff::ArgList ff::SignatureParser::parseArgument(const std::string &str, std::stri
         for (vector<string>::iterator it = al.begin();  \
              it != al.end();it ++) {
             if (it->empty()) {
-                arglist.list.args.push_back(ArgumentType(T_Any));
+                arglist.arglist.push_back(ArgumentType(T_Any));
                 continue;
             }
             if ((space_pos = it->find(' ')) == string::npos) {
-                arglist.list.args.push_back(ArgumentType(it->substr(0, space_pos),  \
+                arglist.arglist.push_back(ArgumentType(it->substr(0, space_pos),  \
                                                 cc::trim(it->substr(space_pos))));
             } else {
-                arglist.list.args.push_back(ArgumentType(*it));
+                arglist.arglist.push_back(ArgumentType(*it));
             }
         }
     }

@@ -8,6 +8,7 @@
 #include <ffconfig.h>
 #include <ccpublic.h>
 #include <fffunction.h>
+#include <ffparser.h>
 
 using std::vector;
 using std::string;
@@ -62,7 +63,7 @@ private:
     TypeSwitch m_ts;
 
     /*
-     *
+     * CFILE
     */
     struct CFILE {
         std::string path;
@@ -82,7 +83,10 @@ private:
      */
     vector<CFILE> m_files;
 
-    //--------------- add fucntion signature
+    /**
+     * @brief m_signatures
+    */
+    vector<Signature> m_signatures;
 
     /* switch */
 private:
@@ -219,6 +223,9 @@ private:
 
     bool
     genFiles(const char* str);
+
+    time_t
+    toTimet(const char* str);
 };
 
 NAMESPACE_FF_END

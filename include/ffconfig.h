@@ -5,9 +5,9 @@
 #define FF_VERSION   "0.0.1"
 
 #define FF_OPTION_HELP  \
-    "functionfind version " FF_VERSION "\n"    \
-    "create by lokalafina\n"    \
-    "create time " __DATE__ "\n"
+    "Version " FF_VERSION "\n"    \
+    "Create by araraloren\n"    \
+    "Build time " __DATE__ "\n"
 
 #define FF_TO_SRTING(x) #x
 

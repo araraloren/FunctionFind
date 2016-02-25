@@ -276,9 +276,30 @@ println(std::ostream& out, T& value, Args... args)
 
 #endif
 
+/*
+ * Repeat
+*/
+const size_t REPEAT_BUFF_LEN = 4096;
+
+std::string
+repeat(char ch, size_t count = 1);
+
+std::string
+repeat(const char* str, size_t count = 1);
+
+std::string
+repeat(const std::string& str, size_t count = 1);
+
+/*
+ * trim
+ * * format_func
+*/
 std::string
 trim(const std::string& str);
 
+/*
+ * get extension name
+*/
 const char*
 getExtname(const char* filename);
 
@@ -288,6 +309,9 @@ getExtname(const char* filename, size_t len);
 std::string
 getExtname(const std::string& filename);
 
+/*
+ * is Directory
+*/
 bool
 isDirectory(const char* path);
 
@@ -315,6 +339,11 @@ searchDirectory(const char* directory, bool recursive, const char* extname);
 
 std::vector<std::string>
 searchDirectory(const std::string& directory, bool recursive, const std::vector<std::string>& exts);
+
+/*
+ * ToString
+*/
+std::string toString(bool boolean);
 
 ccNamespaceEnd(cc)
 

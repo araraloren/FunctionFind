@@ -257,6 +257,42 @@ cc::printf(std::ostream& out, const char* s)
 
 #endif
 
+std::string
+cc::repeat(char ch, size_t count)
+{
+    string ret;
+
+    for (size_t i = 1;i < count;i ++) {
+        ret.push_back(ch);
+    }
+
+    return ret;
+}
+
+std::string
+cc::repeat(const char* str, size_t count)
+{
+    string ret;
+
+    for (size_t i = 1;i < count;i ++) {
+        ret += str;
+    }
+
+    return ret;
+}
+
+std::string
+cc::repeat(const string& str, size_t count)
+{
+    string ret;
+
+    for (size_t i = 1;i < count;i ++) {
+        ret += str;
+    }
+
+    return ret;
+}
+
 std::vector<std::string>
 cc::splitString(const std::string &str, int capacity)
 {
@@ -700,7 +736,7 @@ cc::searchDirectory(const std::string &directory, bool recursive, const std::vec
 
     for (std::vector<std::string>::const_iterator it = exts.begin();    \
          it != exts.end();it ++) {
-        if (it->empty()) {
+        if (!it->empty()) {
             _exts.push_back(*it);
         }
         no_extname = true;
@@ -709,4 +745,10 @@ cc::searchDirectory(const std::string &directory, bool recursive, const std::vec
     searchDirectoryMultiExtname(directory.c_str(), files, recursive, _exts, no_extname);
 
     return files;
+}
+
+std::string
+cc::toString(bool boolean)
+{
+    return string(boolean ? "true" : "false");
 }

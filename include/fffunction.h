@@ -55,60 +55,79 @@ struct VarType {
     {}
 };
 
+/*
+ * T_Error
+ * T_Any
+ * T_Type
+*/
 typedef VarType ArgumentType;
 
+/*
+ * T_Error
+ * T_Any
+ * T_Void
+ * T_Type
+*/
 struct ReturnType {
     Type    type; // var type
     string  name; // type name
 
-    VarType()
+    ReturnType()
         :type(T_None)
         ,name()
     {}
 
-    VarType(Type type)
+    ReturnType(Type type)
         :type(type)
         ,name()
     {}
 
-    VarType(const std::string &type_name)
+    ReturnType(const std::string &type_name)
         :type(T_Type)
         ,name(type_name)
     {}
 };
 
+/*
+ * T_Error
+ * T_List
+ * T_Count
+ * T_Void
+*/
 struct ArgList {
     Type    type;
-    union {
-        vector<ArgumentType> args;
-        size_t count;
-    }list;
+    vector<ArgumentType> arglist;
+    size_t count;
 
     ArgList()
         :type(T_None)
-        ,list()
+        ,arglist()
+        ,count(0)
     {}
 
     ArgList(Type type)
         :type(type)
-        ,list()
+        ,arglist()
+        ,count(0)
     {}
 
     ArgList(const vector<ArgumentType>& arglist)
         :type(T_List)
-        ,list()
-    {
-        list.args = arglist;
-    }
+        ,arglist(arglist)
+        ,count(0)
+    {}
 
     ArgList(size_t count)
         :type(T_Count)
-        ,list()
-    {
-        list.count = count;
-    }
+        ,arglist()
+        ,count(count)
+    {}
 };
 
+/*
+ * T_Name
+ * T_Any
+*/
 struct FuncName {
     Type    type;
     string  name;
@@ -149,6 +168,11 @@ struct Signature {
     bool isNone() const
     {
         return return_type.type == T_None && arg_list.type == T_None && func_name.type == T_None;
+    }
+
+    bool isValid() const
+    {
+        return return_type.type != T_Error && arg_list.type != T_Error;
     }
 };
 
