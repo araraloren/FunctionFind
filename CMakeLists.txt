@@ -31,11 +31,15 @@ set(SRC_LIST
     ./include/fffuncparser.h
     ./include/ffoption.h
     ./include/ffparser.h
+    ./include/ffsearchthread.h
+    ./include/ffsearchtask.h
 
     ./src/main.cpp
     ./src/fffuncparser.cpp
     ./src/ffoption.cpp
     ./src/ffparser.cpp
+    ./src/ffsearchthread.cpp
+    ./src/ffsearchtask.cpp
 
     ./threadpool/syncsemaphore.h
     ./threadpool/threadpool.cpp
