@@ -4,16 +4,17 @@
 #include <cctest.h>
 #include <functional>
 #include <ffoption.h>
+#include <ffsearchthread.h>
 
 using namespace std;
 
 int main(int argc, char** argv)
 {
-    ff::CommandOption *ffop = ff::CommandOption::getInstance();
+    //ff::CommandOption *ffop = ff::CommandOption::getInstance();
 
-    ffop->parseArgv(argc, argv);
-
-    ffop->debugOption();
+    //ffop->parseArgv(argc, argv);
+FF_AVOID_WARNING(argc);FF_AVOID_WARNING(argv);
+    //ffop->debugOption();
 
     cc::SSeqQueue<int> squeue;
 
@@ -37,6 +38,8 @@ int main(int argc, char** argv)
 #endif
 
     cout <<cc::trim(string("   ; "))<<endl;
+
+    ff::search(nullptr);
 
     return 0;
 }
