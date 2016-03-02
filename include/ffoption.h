@@ -18,6 +18,21 @@ NAMESPACE_FF_BEGIN
 
 const size_t FF_ARGS_MAX = 128;
 
+/*
+ * CFILE
+*/
+struct CFile {
+    std::string path;
+    std::int32_t eflag;
+    CFile() :path(), eflag(0) {}
+    CFile(const char* path, std::int32_t eflag): path(path), eflag(eflag) {}
+    CFile(const std::string path, std::int32_t eflag): path(path), eflag(eflag) {}
+};
+
+struct CDir : public CFile {
+    std::vector<std::string> exts;
+};
+
 class CommandOption
 {
 public:
@@ -32,10 +47,47 @@ public:
     parseArgv(int argc, char ** argv);
 
     void
-    help(const char* name, int err_msg_code);
+    help(const char* name, int err_msg_code) const;
 
     void
-    debugOption();
+    debugOption() const;
+
+public:
+    const vector<CFile>&
+    getFiles() const { return m_files; }
+
+    const vector<Signature>&
+    getSignatures() const { return m_signatures; }
+
+public:
+    bool is_ignore_case() const { return m_ignore_case; }
+
+    bool is_recursive() const { return m_recursive; }
+
+    bool is_print_filename() const { return m_print_fn; }
+
+    bool is_print_linenumber() const { return m_print_ln; }
+
+    bool is_print_offset() const { return m_print_off; }
+
+    bool is_print_columnnumber() const { return m_print_col; }
+
+    bool is_print_onlycount() const { return m_print_oc; }
+
+public:
+    time_t getStartTime() const { return m_start_tm; }
+
+    time_t getEndTime() const { return m_end_tm; }
+
+    int getJobThread() const { return m_job_t; }
+
+    int getArgsCount() const { return m_args_cnt; }
+
+    const char* getArgs(int index) const { return m_args[index]; }
+
+    const string& getClassName() const { return m_class_name; }
+
+    const string& getStructName() const { return m_struct_name; }
 
 private:
     /* constructor */
@@ -62,26 +114,11 @@ private:
      */
     TypeSwitch m_ts;
 
-    /*
-     * CFILE
-    */
-    struct CFILE {
-        std::string path;
-        std::int32_t eflag;
-        CFILE() :path(), eflag(0) {}
-        CFILE(const char* path, std::int32_t eflag): path(path), eflag(eflag) {}
-        CFILE(const std::string path, std::int32_t eflag): path(path), eflag(eflag) {}
-    };
-
-    struct CDIR : public CFILE {
-        std::vector<std::string> exts;
-    };
-
     /**
      * @brief m_files
      * - files will be parse
      */
-    vector<CFILE> m_files;
+    vector<CFile> m_files;
 
     /**
      * @brief m_signatures

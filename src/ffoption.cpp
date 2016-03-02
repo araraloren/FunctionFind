@@ -145,7 +145,7 @@ bool CommandOption::parseArgv(int argc, char **argv)
     }
     cur ++; // next is file
 
-    vector<CDIR> dofs;
+    vector<CDir> dofs;
 
     //generate files
     for (FileType ft = FT_OTHER;cur < argc;cur ++) {
@@ -153,7 +153,7 @@ bool CommandOption::parseArgv(int argc, char **argv)
             break;
         }
         if ((ft = getFileType(*(argv + cur))) != FT_OTHER) {
-            CDIR dof;
+            CDir dof;
 
             dof.path    = *(argv + cur);
             dof.eflag   |= ft;
@@ -244,7 +244,7 @@ bool CommandOption::parseArgv(int argc, char **argv)
         while (std::fgets(stdinfile, 2048, stdin)) {
             stdinfile[std::strlen(stdinfile) - 1] = '\0';
             if ((ft = getFileType(stdinfile)) != FT_OTHER) {
-                CDIR dof;
+                CDir dof;
 
                 dof.path    = stdinfile;
                 dof.eflag   |= ft;
@@ -256,7 +256,7 @@ bool CommandOption::parseArgv(int argc, char **argv)
 
     //process dofs
     vector<string> res;
-    for (vector<CDIR>::iterator it = dofs.begin(); \
+    for (vector<CDir>::iterator it = dofs.begin(); \
          it != dofs.end();it ++) {
         // search file
         if (it->eflag & FT_DIR) {
@@ -269,13 +269,13 @@ bool CommandOption::parseArgv(int argc, char **argv)
 
             for (vector<string>::iterator jt = res.begin();
                  jt != res.end(); jt ++) {
-                m_files.push_back(CFILE(*jt, getFileType(jt->c_str())));
+                m_files.push_back(CFile(*jt, getFileType(jt->c_str())));
             }
             // continue to CDIR
             continue;
         }
         // file
-        m_files.push_back(CFILE(it->path, it->eflag));
+        m_files.push_back(CFile(it->path, it->eflag));
     }
 
     if (clang_args) {
@@ -311,7 +311,7 @@ bool CommandOption::parseArgv(int argc, char **argv)
     return true;
 }
 
-void CommandOption::debugOption()
+void CommandOption::debugOption() const
 {
     std::fprintf(stderr, "debug optional ---> \n");
 
@@ -325,7 +325,7 @@ void CommandOption::debugOption()
     std::fprintf(stderr, "\n");
 
     std::fprintf(stderr, "CFILE -> [");
-    for(vector<CFILE>::iterator it = m_files.begin();   \
+    for(vector<CFile>::const_iterator it = m_files.begin();   \
         it != m_files.end();it ++) {
         std::fprintf(stderr, " %s-%d", it->path.c_str(), it->eflag);
     }
@@ -362,7 +362,7 @@ void CommandOption::debugOption()
     std::fprintf(stderr, "%s\n", cc::repeat('*', 50).c_str());
 }
 
-void CommandOption::help(const char *name, int err_msg_code)
+void CommandOption::help(const char *name, int err_msg_code) const
 {
     const static char* s_msg[] = {
         "Missing search type.",
