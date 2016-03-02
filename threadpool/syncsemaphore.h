@@ -13,8 +13,11 @@ public:
 
 	bool notify();
 
+    bool full();
+
 protected:
 	sem_t   sync_sem_;
+    int     max_;
 };
 
 #endif // SYNCSEMAPHORE_H
