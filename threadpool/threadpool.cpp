@@ -20,6 +20,8 @@ ThreadPool::~ThreadPool()
 bool
 ThreadPool::init()
 {
+    task_queue_.init();
+
 	if (!sync_sem_.init(task_queue_.size())) {
 		return false;
 	}
@@ -32,7 +34,7 @@ ThreadPool::init()
 			return false;
 		}
 
-		this->thread_pool_.push_back(thr);
+        this->thread_pool_[i] = thr;
 	}
 
 	return true;
@@ -41,11 +43,13 @@ ThreadPool::init()
 bool
 ThreadPool::dispatchTask(ITask* task)
 {
-	if (!task && !sync_sem_.notify()) {
+    if (!task && this->sync_sem_.full()) {
 		return false;
 	}
 
 	this->task_queue_.push(task);
+
+    this->sync_sem_.notify();
 
 	return true;
 }
