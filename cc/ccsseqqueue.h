@@ -29,6 +29,7 @@ public:
     void
     push(const T& ref)
     {
+        assert(size_.get() != this->cc::SeqQueue<T>::m_length);
 		this->cc::SeqQueue<T>::push(ref);
 		size_.inc();
     }
@@ -36,6 +37,7 @@ public:
     void
     pop(T& ref)
     {
+        assert(size_.get() != 0);
 		this->cc::SeqQueue<T>::pop(ref);
 		size_.dec();
     }

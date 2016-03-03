@@ -6,6 +6,7 @@
 #include <cctypedef.h>
 #include <ccpublic.h>
 #include <ccatomic.h>
+#include <cassert>
 
 //cc namespace
 ccNamespaceDeclare(cc)
@@ -77,6 +78,8 @@ public:
 	void
 	push(const T& ref)
     {
+        assert(m_sq);
+
         uint8_t U_CAN_PUT = FV_CAN_PUT;
 
         //获取当前的下一个pos
@@ -98,6 +101,8 @@ public:
 	void
 	pop(T& ref)
     {
+        assert(m_sq);
+
         uint8_t U_CAN_GET = FV_CAN_GET;
 
         register PT curr_pos = m_back.inc() % m_length;
@@ -108,8 +113,6 @@ public:
             U_CAN_GET = FV_CAN_GET;
 #endif
 		}
-
-
 
         ref = *(m_sq + curr_pos);
 		(m_flags + curr_pos)->set( FV_CAN_PUT);
@@ -138,6 +141,7 @@ protected:
 		for (size_t i = 0;i < m_length;++ i) {
 			(m_flags + i)->~Atomic();
 		}
+        delete m_flags;
     }
 
 private:
