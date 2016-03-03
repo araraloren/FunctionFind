@@ -6,8 +6,6 @@
 
 NAMESPACE_FF_BEGIN
 
-
-
 const size_t TASK_QUEUE_SIZE = 1024;
 
 cc::thread_ret_t CC_THREAD search(cc::thread_para_t para);

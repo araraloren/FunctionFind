@@ -25,6 +25,9 @@ void ff::DispatchTask::run()
 void ff::SearchTask::run()
 {
     g_completed.push(this);
+    FF_AVOID_WARNING(m_cmdopt);
+    FF_AVOID_WARNING(m_file);
+    FF_AVOID_WARNING(m_threadpool);
 }
 
 
