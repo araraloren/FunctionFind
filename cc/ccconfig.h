@@ -18,12 +18,30 @@
 
 
 //compiler
-#ifdef __GNUC__
+#if (defined __GNUC__) && (!defined __clang__)
 #   define CC_C_GCC
 #elif (defined _MSC_VER)
 #   define CC_C_MSVC
+#elif (defined __clang__)
+#   define CC_C_CLANG
 #else
 #   error "not support ..."
+#endif
+
+
+//remove clang register warning
+#ifdef CC_C_CLANG
+#   define register
+#endif
+
+#if __cplusplus >= 201103L
+#   ifdef CC_C_GCC
+#       if __GNUC__ > 4 && __GNUC_MINOR__ >= 9 || __GNUC__ >= 5
+#           define CC_REGEX
+#       endif
+#   elif (defined CC_C_CLANG)
+#       define CC_REGEX
+#   endif
 #endif
 
 #if (defined CC_PF_WIN32) || (defined CC_PF_MFC)
