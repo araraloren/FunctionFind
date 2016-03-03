@@ -62,7 +62,7 @@ public:
 #   if (defined CC_PF_LINUX) || (defined CC_PF_MINGW32)
 		pthread_join(this->thread_, 0);
 #	elif (defined CC_PF_WIN32)
-#warning "win32 thread can not detach"
+#       warning "win32 thread can not detach"
 #   endif
 #endif
 	}
