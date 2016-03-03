@@ -4,14 +4,14 @@
 #include <cassert>
 
 bool
-SyncSemaphore::init(int max)
+SyncSemaphore::init(int initvalue)
 {
 	int ret = 0;
 
-	ret = ! ::sem_init(&sync_sem_, 0, max);
+    ret = ! ::sem_init(&sync_sem_, 0, initvalue);
 	assert( ret );
 
-    max_ = max;
+    max_ = initvalue;
 
 	return ret;
 }
@@ -45,4 +45,14 @@ bool SyncSemaphore::full()
     assert( ret );
 
     return cur == max_;
+}
+
+int SyncSemaphore::getValue()
+{
+    int cur = 0, ret = 0;
+
+    ret = ! ::sem_getvalue(&sync_sem_, &cur);
+    assert( ret );
+
+    return cur;
 }

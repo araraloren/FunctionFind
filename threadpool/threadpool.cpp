@@ -22,7 +22,8 @@ ThreadPool::init()
 {
     task_queue_.init();
 
-	if (!sync_sem_.init(task_queue_.size())) {
+    //fix !!!
+    if (!sync_sem_.init(0)) {
 		return false;
 	}
 
@@ -49,7 +50,9 @@ ThreadPool::dispatchTask(ITask* task)
 
 	this->task_queue_.push(task);
 
-    this->sync_sem_.notify();
+    while (!this->sync_sem_.notify()) {
+        cc::microSleep(5000);
+    }
 
 	return true;
 }
@@ -57,11 +60,25 @@ ThreadPool::dispatchTask(ITask* task)
 void
 ThreadPool::stop()
 {
-	this->notifyAllThreadQuit();
+    for(std::vector<Thread<ThreadPool>*>::iterator it = thread_pool_.begin();    \
+                    it != thread_pool_.end();it ++) {
+            Thread<ThreadPool>* thread = (*it);
+
+            thread->initQuit(); //!!!should init before quit
+            thread->setQuitFlag();
+    }
 
 	for (size_t i = 0;i < this->size_;i ++) {
-		this->sync_sem_.notify();
+        this->sync_sem_.notify();
 	}
+
+    for(std::vector<Thread<ThreadPool>*>::iterator it = thread_pool_.begin();    \
+                    it != thread_pool_.end();it ++) {
+            Thread<ThreadPool>* thread = (*it);
+
+            thread->quit();
+            thread->join();
+    }
 
 	while(this->quit_.get() < this->size_) {
 		cc::microSleep(500);
@@ -93,7 +110,7 @@ ThreadPool::s_run(cc::thread_para_t arg)
 		current_pool->waitForTask();
 
         //thread shoud be quit
-		if (thread->canQuit()) {
+        if (thread->canQuit() && thread->waitQuit()) {
 			current_pool->notifyPoolQuited();
 			break;
 		}

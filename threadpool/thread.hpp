@@ -2,6 +2,7 @@
 #define THREAD_H
 
 #include <ccthread.h>
+#include <syncsemaphore.h>
 
 template <typename Tp>
 class Thread
@@ -12,6 +13,7 @@ public:
 		,quit_(false)
 		,pool_(pool)
 		,thread_()
+        ,syncsem_()
 	{}
 
 	bool
@@ -56,10 +58,16 @@ public:
 		this->idle_ = !this->idle_;
 	}
 
+    void
+    initQuit()
+    {
+        syncsem_.init();
+    }
+
 	bool
-	canQuit()
+    canQuit()
 	{
-		return this->quit_;
+        return this->quit_;
 	}
 
 	void
@@ -68,14 +76,31 @@ public:
 		this->quit_ = true;
 	}
 
+    bool
+    waitQuit()
+    {
+        return syncsem_.wait();
+    }
+
+    void
+    quit()
+    {
+        syncsem_.notify();
+    }
+private:
+    Thread(const Thread&);
+    Thread& operator =(const Thread&);
+
 private:
 	bool idle_;
 
-	bool quit_;
+    volatile bool quit_;
 
 	Tp* pool_;
 
 	cc::Thread	thread_;
+
+    SyncSemaphore syncsem_;
 };
 
 #endif // THREAD_H
