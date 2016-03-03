@@ -10,6 +10,7 @@
 #   include <sys/stat.h>
 #endif
 
+#include <cstring>
 #include <cctype>
 #include <ctime>
 
@@ -341,7 +342,7 @@ cc::splitString(const std::string &str, cc::format_func *pf, int capacity)
     return ret;
 }
 
-#if __cplusplus >= 201103L
+#ifdef CC_REGEX
 std::vector<std::string>
 cc::splitString(const std::string &str, const std::string &sep, int capacity)
 {

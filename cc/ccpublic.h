@@ -104,7 +104,7 @@ struct splitstring_helper<char> {
     static const bool value = true;
 };
 
-#if __cplusplus >= 201103L
+#ifdef CC_REGEX
 
 std::vector<std::string>
 splitString(const std::string &str, const std::string& regex, int capacity = 1);
