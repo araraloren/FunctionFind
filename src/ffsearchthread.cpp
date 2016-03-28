@@ -16,7 +16,7 @@ cc::thread_ret_t ff::search(cc::thread_para_t para)
 
     threadpool.dispatchTask(task);
 
-    cc::microSleep(10);
+    cc::microSleep(1000000L);
 
     threadpool.stop();
 

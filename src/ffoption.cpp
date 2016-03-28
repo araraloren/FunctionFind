@@ -90,7 +90,7 @@ bool CommandOption::genTypeSwitch(const char *str)
     for(;*str != '\0';str ++) {
         switch (*str) {
         case 'f': m_ts = (TypeSwitch)(m_ts | TSFUNC); break;
-        case 'b': m_ts = (TypeSwitch)(m_ts | TSDECL); break;
+        case 'd': m_ts = (TypeSwitch)(m_ts | TSDECL); break;
         case '-': break;
         default:
             return false;
@@ -327,7 +327,7 @@ void CommandOption::debugOption() const
     std::fprintf(stderr, "CFILE -> [");
     for(vector<CFile>::const_iterator it = m_files.begin();   \
         it != m_files.end();it ++) {
-        std::fprintf(stderr, " %s-%d", it->path.c_str(), it->eflag);
+        std::fprintf(stderr, " %s -flag: %d ==", it->path.c_str(), it->eflag);
     }
     std::fprintf(stderr, " ]\n");
 
@@ -377,7 +377,7 @@ void CommandOption::help(const char *name, int err_msg_code) const
     std::fprintf(stdout, "%s USAGE:\n", name);
 
     const char* help_msg = ""   \
-                           "[ff] [type switch] [files] [switch] [option] [function signature]\n"	\
+                           "ff [type switch] [files] [switch] [option] [function signature]\n"	\
                            "\n"	\
                            "--files may be from std input \n"	\
                            "\n"	\

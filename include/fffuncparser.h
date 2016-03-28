@@ -46,7 +46,8 @@ public:
 
 private:
     //add CXCursorKind parser
-    template <CXCursorKind kind> Function
+    template <CXCursorKind kind>
+    Function
     parseCursor(CXCursor cursor);
 
 private:
@@ -80,18 +81,32 @@ FuncParser::parseCursor<CXCursor_FunctionDecl>(CXCursor cursor)
 {
     Function func;
 
-    int num = clang_Cursor_getNumArguments(cursor);
+    clang::String fname(clang_getCursorSpelling(cursor));
 
-    CXCursor arg;
+    func.func_name = fname.str();
 
-    for (int i = 0;i < num;i ++) {
-        arg = clang_Cursor_getArgument(cursor, i);
+    int n = clang_Cursor_getNumArguments(cursor);
 
-        // todo
-        FF_AVOID_WARNING(func);
+    if (n < 0) {
+        func.arg_list = ArgList();
+    } else if (n == 0) {
+        func.arg_list = ArgList(Type::T_Void);
     }
 
-    return Function();
+    ArgList arglist(Type::T_List);
+
+    arglist.count = n;
+    for (int i = 0;i < n; i++) {
+        CXCursor arg = clang_Cursor_getArgument(cursor, i);
+
+        clang::String argname = clang_getCursorSpelling(arg);
+
+        clang::String argtypename = clang_getTypeSpelling(clang_getCursorType(arg));
+
+        arglist.arglist.push_back(ArgumentType(argtypename.str(), argname.str()));
+    }
+
+    return func;
 }
 
 template <> Function

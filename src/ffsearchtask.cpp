@@ -18,12 +18,11 @@ void ff::DispatchTask::run()
 
         m_threadpool->dispatchTask(task);
     }
-
-    printf("%s\n", "Run ok!");
 }
 
 void ff::SearchTask::run()
 {
+    printf("%s\n", m_file.path.c_str());
     g_completed.push(this);
     FF_AVOID_WARNING(m_cmdopt);
     FF_AVOID_WARNING(m_file);

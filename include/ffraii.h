@@ -64,6 +64,11 @@ typedef RAIIHelper<CXTranslationUnit, clang_disposeTranslationUnit>
     TranslationUnit;
 
 class String: public RAIIHelper<CXString, clang_disposeString> {
+public:
+    String(CXString str)
+        :RAIIHelper(str)
+    {}
+
     std::string str() const
     {
         return std::string(clang_getCString(get()));
