@@ -511,6 +511,7 @@ using std::strcmp;
                 if (!S_ISDIR(fstat.st_mode)) {
                     const char *e = std::strrchr(curpath, '.');
 
+                    e++;
                     if (e != nullptr) {
                         for (std::vector<std::string>::const_iterator ci = exts.begin();
                              ci != exts.end(); ci ++) {
@@ -565,6 +566,7 @@ using std::strcmp;
                 if (!S_ISDIR(fstat.st_mode)) {
                     const char *e = std::strrchr(curpath, '.');
 
+                    e++;
                     if (e != nullptr && strcmp(e + 1, extname) == 0) {
                         files.push_back(std::string(curpath, count));
                     }
@@ -611,6 +613,7 @@ using std::strcmp;
                 if (!S_ISDIR(fstat.st_mode)) {
                     const char *e = std::strrchr(curpath, '.');
 
+                    e++;
                     if (e == nullptr) {
                         files.push_back(std::string(curpath, count));
                     }
