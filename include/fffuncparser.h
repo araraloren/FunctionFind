@@ -46,7 +46,7 @@ public:
 
 private:
     //add CXCursorKind parser
-    template <CXCursorKind kind>
+    template <CXCursorKind>
     Function
     parseCursor(CXCursor cursor);
 

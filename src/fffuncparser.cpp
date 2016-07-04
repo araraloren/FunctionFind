@@ -75,20 +75,7 @@ FuncParser::visitCursor(CXCursor cursor)
         return CXChildVisit_Continue;
     }
 
-    switch(kind) {
-    case CXCursor_FunctionDecl:
-        this->parseCursor<CXCursor_FunctionDecl>(cursor);
-        break;
-        case CXCursor_FunctionTemplate: { }
-        case CXCursor_CXXMethod: { }
-        case CXCursor_Constructor: { }
-        case CXCursor_Destructor: { }
-        case CXCursor_ConversionFunction: { }
-        case CXCursor_ClassDecl: { }
-        case CXCursor_StructDecl: { }
-    default:
-        return CXChildVisit_Break;
-    }
+    m_func_list.push_back(this->parseCursor<kind>(cursor));
 
     return CXChildVisit_Continue;
 }
